@@ -49,5 +49,5 @@ poetry install
 conda install -c conda-forge pandoc
 
 # Generate docs
-sphinx-build documentation docs
+sphinx-build documentation docs && touch docs/.nojekyll
 ```
