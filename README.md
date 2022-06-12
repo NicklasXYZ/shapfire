@@ -1,5 +1,5 @@
 
-![](docs/logo/shapfirelogov2.png)
+![](documentation/logo/shapfirelogov2.png)
 
 
 # About
