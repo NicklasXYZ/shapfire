@@ -1,0 +1,967 @@
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+
+      <link rel="icon" href="../../_static/favicon.ico">
+
+
+
+        <title>shapfire.plotting - ShapFire</title>
+
+
+
+      <link rel="stylesheet" href="../../_static/stylesheets/main.8674dc46.min.css">
+
+
+        <link rel="stylesheet" href="../../_static/stylesheets/palette.92c9fe4a.min.css">
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+        <link rel="stylesheet" type="text/css" href="../../_static/extra_cssv2.css" />
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan">
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+
+        </aside>
+      </div>
+
+
+
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../index.html" title="ShapFire" class="md-header__button md-logo" aria-label="ShapFire" data-md-component="logo">
+      <img src="../../_static/fire.svg" alt="logo">
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ShapFire
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              shapfire.plotting
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+      <form class="md-header__option" data-md-component="palette">
+
+
+
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+
+
+      </form>
+
+
+
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <div class="md-header__source">
+        <a href="https://github.com/nicklasxyz/shapfire/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ShapFire
+  </div>
+</a>
+      </div>
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="ShapFire" class="md-nav__button md-logo" aria-label="ShapFire" data-md-component="logo">
+      <img src="../../_static/fire.svg" alt="logo">
+    </a>
+    ShapFire
+  </label>
+
+    <div class="md-nav__source">
+      <a href="https://github.com/nicklasxyz/shapfire/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ShapFire
+  </div>
+</a>
+    </div>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        <span title="index (document)" class="md-ellipsis">About</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source/examples/index.html" class="md-nav__link">
+        <span title="source/examples/index (document)" class="md-ellipsis">Examples</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source/api/api_reference.html" class="md-nav__link">
+        <span title="source/api/api_reference (document)" class="md-ellipsis">API Reference</span>
+      </a>
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset" role="main">
+
+  <a href="https://github.com/nicklasxyz/shapfire/blob/main/docs/_modules/shapfire/plotting.rst" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+  <h1>Source code for shapfire.plotting</h1><div class="highlight"><pre>
+<span></span><code><span class="sd">&quot;&quot;&quot;This file contains methods for plotting results and other information that</span>
+<span class="sd">have been obtained through the application of the ShapFire method.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">matplotlib.axes</span> <span class="kn">import</span> <span class="n">Axes</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">matplotlib.lines</span> <span class="kn">import</span> <span class="n">Line2D</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">auc</span>
+
+<span class="c1"># Define the main color palette to use for plots and other illustations</span>
+<span class="n">MAIN_COLOR_PALETTE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="s2">&quot;#feffff&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;selected&quot;</span><span class="p">:</span> <span class="s2">&quot;#25c5da&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rejected&quot;</span><span class="p">:</span> <span class="s2">&quot;#010105&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;secondary&quot;</span><span class="p">:</span> <span class="s2">&quot;#c53e6e&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tertiary&quot;</span><span class="p">:</span> <span class="s2">&quot;#3e77bf&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;overlay&quot;</span><span class="p">:</span> <span class="s2">&quot;#9c9d9d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;grid&quot;</span><span class="p">:</span> <span class="s2">&quot;#d2d2d2&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Define the main matplotlib and seaborn plotting settings</span>
+<span class="n">DEFAULT_PLOTTING_SETTINGS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;axes.facecolor&quot;</span><span class="p">:</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;patch.edgecolor&quot;</span><span class="p">:</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;figure.facecolor&quot;</span><span class="p">:</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;axes.edgecolor&quot;</span><span class="p">:</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;savefig.edgecolor&quot;</span><span class="p">:</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;savefig.facecolor&quot;</span><span class="p">:</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;grid.color&quot;</span><span class="p">:</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;grid&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;lines.linewidth&quot;</span><span class="p">:</span> <span class="mf">1.30</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">ShapFirePlottingInterface</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shapfire</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+        <span class="c1"># Class vars corresponding to input args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shapfire</span> <span class="o">=</span> <span class="n">shapfire</span>  <span class="c1"># noqa</span>
+
+        <span class="c1"># Internal vars for easy access to data associated with the importance</span>
+        <span class="c1"># ranking of features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_jointplot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_groupby</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">plot_ranking</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">groupby</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cluster&quot;</span><span class="p">,</span>
+        <span class="n">rcParams</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">with_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">with_overlay</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">ax</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Axes</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="n">Axes</span><span class="p">]:</span>
+        <span class="n">plot_type</span> <span class="o">=</span> <span class="s2">&quot;stripplot&quot;</span>
+        <span class="c1"># Define the default plotting options</span>
+        <span class="n">PLOT_IMPORTANCE_OPTIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="c1"># Do not allow violinplot. The elements will be squished too</span>
+            <span class="c1"># much and result in an awful representation of the data</span>
+            <span class="s2">&quot;stripplot&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;func&quot;</span><span class="p">:</span> <span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">,</span>
+                <span class="s2">&quot;xargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dodge&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;ax&quot;</span><span class="p">:</span> <span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="s2">&quot;o&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Validate given input arguments</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">groupby</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;The given input argument &#39;groupby&#39; should be of type &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;&#39;str&#39; but an argument of type &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">groupby</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39; was given.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">GROUBPBY_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;feature&quot;</span><span class="p">,</span> <span class="s2">&quot;cluster&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">groupby</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">GROUBPBY_OPTIONS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The given input argument &#39;groupby&#39; should be one &quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;of the following options: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GROUBPBY_OPTIONS</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; but an argument &#39;</span><span class="si">{</span><span class="n">groupby</span><span class="si">}</span><span class="s2">&#39; was given.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># No axis was passed as function input argument. Thus create a new</span>
+            <span class="c1"># axis object</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Get figure from the Axes object so we can subsequently apply</span>
+            <span class="c1"># styling to it</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+
+        <span class="c1"># Apply styling to the plot elements</span>
+        <span class="n">_apply_default_styling</span><span class="p">(</span><span class="n">rcParams</span><span class="p">)</span>
+
+        <span class="c1"># Prepare the appropriate data for plotting</span>
+        <span class="n">_groupby</span> <span class="o">=</span> <span class="n">groupby</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">_groupby</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_groupby</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_data</span><span class="p">(</span><span class="n">groupby</span><span class="o">=</span><span class="n">_groupby</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_groupby</span> <span class="o">=</span> <span class="n">_groupby</span>
+
+        <span class="c1"># Unpack all necessary data for plotting</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;df&quot;</span><span class="p">]</span>
+        <span class="n">feature_ordering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;feature_ordering&quot;</span><span class="p">]</span>
+        <span class="n">feature_colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;feature_colors&quot;</span><span class="p">]</span>
+        <span class="n">cluster_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s2">&quot;cluster_labels&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Determine the searborn function to use for plotting and set function</span>
+        <span class="c1"># arguments that should be passed to the plotting function</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;ranked_difference&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">df</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">plotting_function</span> <span class="o">=</span> <span class="n">PLOT_IMPORTANCE_OPTIONS</span><span class="p">[</span><span class="n">plot_type</span><span class="p">][</span><span class="s2">&quot;func&quot;</span><span class="p">]</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">PLOT_IMPORTANCE_OPTIONS</span><span class="p">[</span><span class="n">plot_type</span><span class="p">][</span><span class="s2">&quot;xargs&quot;</span><span class="p">])</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plotting_function</span><span class="p">(</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">feature_ordering</span><span class="p">,</span>
+            <span class="n">palette</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">feature_colors</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="o">**</span><span class="n">args</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">top</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">right</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">trim</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">x_max</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;ranked_difference&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;ranked_difference&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+
+        <span class="c1"># Add additional plot overlays depending on how features should be</span>
+        <span class="c1"># grouped and displayed in the plot</span>
+        <span class="k">if</span> <span class="n">groupby</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;cluster&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">with_text</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">or</span> <span class="n">with_overlay</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># Add two alternating gray-scale colors for grouping features</span>
+                <span class="c1"># based on the cluster they each belong to. Also, add text</span>
+                <span class="c1"># information about the cluster each feature belongs to</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_cluster_overlays</span><span class="p">(</span>
+                    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                    <span class="n">cluster_labels</span><span class="o">=</span><span class="n">cluster_labels</span><span class="p">,</span>
+                    <span class="n">with_text</span><span class="o">=</span><span class="n">with_text</span><span class="p">,</span>
+                    <span class="n">with_overlay</span><span class="o">=</span><span class="n">with_overlay</span><span class="p">,</span>
+                    <span class="n">x_offset</span><span class="o">=</span><span class="n">x_max</span> <span class="o">*</span> <span class="mf">1.075</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">groupby</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;feature&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">with_overlay</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># Add two alternating gray-scale colors for better seperation</span>
+                <span class="c1"># of the plotted data. By default do not add text information</span>
+                <span class="c1"># about the clusters each feature belong to. For this purpose,</span>
+                <span class="c1"># the groupby = &quot;cluster&quot; should be chosen</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_feature_overlays</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cluster_labels</span><span class="o">=</span><span class="n">cluster_labels</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The given input argument &#39;groupby&#39; should have value &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;&#39;feature&#39; or &#39;cluster&#39; but value &#39;</span><span class="si">{</span><span class="n">groupby</span><span class="si">}</span><span class="s2">&#39; was given.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Indicate the cut-off threshold</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shapfire</span><span class="o">.</span><span class="n">threshold_finder</span><span class="o">.</span><span class="n">lower_threshold</span><span class="p">,</span>
+            <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+            <span class="n">lw</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;tertiary&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add a legend to the figure indicating which feautres have been</span>
+        <span class="c1"># selected and which have been rejected</span>
+        <span class="n">custom_lines</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Line2D</span><span class="p">(</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;tertiary&quot;</span><span class="p">],</span>
+                <span class="n">lw</span><span class="o">=</span><span class="mf">2.25</span><span class="p">,</span>
+                <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">Line2D</span><span class="p">(</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;selected&quot;</span><span class="p">],</span>
+                <span class="n">lw</span><span class="o">=</span><span class="mf">2.25</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">Line2D</span><span class="p">(</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;rejected&quot;</span><span class="p">],</span>
+                <span class="n">lw</span><span class="o">=</span><span class="mf">2.25</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+            <span class="n">custom_lines</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">&quot;Threshold&quot;</span><span class="p">,</span> <span class="s2">&quot;Selected&quot;</span><span class="p">,</span> <span class="s2">&quot;Rejected&quot;</span><span class="p">],</span>
+            <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">handlelength</span><span class="o">=</span><span class="mf">2.75</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Make changes related to figure size, title, x-axis labels + ticks,</span>
+        <span class="c1"># y-axis labels + and ticks, etc.</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+            <span class="s2">&quot;Importance ranking &amp; selected features&quot;</span><span class="p">,</span>
+            <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">pad</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Ranked difference&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Feature name&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Set x and y-axis ticks</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;minor&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_zorder</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Set figure size</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">_set_figure_size</span><span class="p">(</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
+            <span class="n">fig</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+            <span class="n">num_all_features</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_list</span><span class="p">())),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">groupby</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="n">feature_ranking_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapfire</span><span class="o">.</span><span class="n">ranked_differences</span>
+
+        <span class="k">if</span> <span class="n">groupby</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;cluster&quot;</span><span class="p">:</span>
+            <span class="n">_feature_ranking_df</span> <span class="o">=</span> <span class="n">feature_ranking_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">cluster_ordering</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">_feature_ranking_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">]</span>
+                <span class="o">.</span><span class="n">values</span>
+            <span class="p">)</span>
+            <span class="n">_feature_ranking_df</span><span class="p">[</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span>
+                <span class="n">_feature_ranking_df</span><span class="p">[</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">categories</span><span class="o">=</span><span class="n">cluster_ordering</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">_feature_ranking_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+                <span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">,</span> <span class="s2">&quot;ranked_difference&quot;</span><span class="p">],</span>
+                <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span>
+                <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">groupby</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;feature&quot;</span><span class="p">:</span>
+            <span class="n">_feature_ranking_df</span> <span class="o">=</span> <span class="n">feature_ranking_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The given input argument &#39;groupby&#39; should have value &quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;&#39;feature&#39; or &#39;cluster&#39; but value &#39;</span><span class="si">{</span><span class="n">groupby</span><span class="si">}</span><span class="s2">&#39; was given.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Extract a list of clusters that each selected feature is associated</span>
+        <span class="c1"># with</span>
+        <span class="n">cluster_labels</span> <span class="o">=</span> <span class="n">_feature_ranking_df</span><span class="p">[</span><span class="s2">&quot;cluster_label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">all_feature_names</span> <span class="o">=</span> <span class="n">_feature_ranking_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+        <span class="n">selected_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapfire</span><span class="o">.</span><span class="n">selected_features</span>
+
+        <span class="c1"># Set colors for each selected/rejected feature</span>
+        <span class="n">feature_colors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="n">all_feature_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="n">selected_features</span><span class="p">:</span>
+                <span class="n">feature_colors</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;selected&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">feature_colors</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;rejected&quot;</span><span class="p">]</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapfire</span><span class="o">.</span><span class="n">ranked_differences</span><span class="p">[</span><span class="s2">&quot;ranked_difference&quot;</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapfire</span><span class="o">.</span><span class="n">ranked_differences</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">num_all_features</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">_y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+        <span class="n">_y</span><span class="p">[</span><span class="s2">&quot;feature_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span>
+            <span class="n">_y</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">all_feature_names</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">_y</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;feature_name&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapfire</span><span class="o">.</span><span class="n">ranked_differences</span><span class="p">,</span>
+            <span class="s2">&quot;feature_ordering&quot;</span><span class="p">:</span> <span class="n">all_feature_names</span><span class="p">,</span>
+            <span class="s2">&quot;feature_colors&quot;</span><span class="p">:</span> <span class="n">feature_colors</span><span class="p">,</span>
+            <span class="s2">&quot;selected_features&quot;</span><span class="p">:</span> <span class="n">selected_features</span><span class="p">,</span>
+            <span class="s2">&quot;all_feature_names&quot;</span><span class="p">:</span> <span class="n">all_feature_names</span><span class="p">,</span>
+            <span class="s2">&quot;cluster_labels&quot;</span><span class="p">:</span> <span class="n">cluster_labels</span><span class="p">,</span>
+            <span class="c1"># Other fields...</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
+            <span class="s2">&quot;_y&quot;</span><span class="p">:</span> <span class="n">_y</span><span class="p">,</span>
+            <span class="s2">&quot;num_all_features&quot;</span><span class="p">:</span> <span class="n">num_all_features</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_add_cluster_overlays</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
+        <span class="n">cluster_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">fontsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">with_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">with_overlay</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">x_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># y-offset. Move text slightly down</span>
+        <span class="n">text_placement_offset</span> <span class="o">=</span> <span class="mf">0.00</span>
+        <span class="n">current_cluster_label</span> <span class="o">=</span> <span class="n">cluster_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lower_value</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span>
+        <span class="n">upper_value</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">last_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cluster_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Alpha values associated with the two alternating overlays</span>
+        <span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]</span>
+
+        <span class="c1"># Values pertaining to first cluster overlay</span>
+        <span class="n">counter0</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">counter1</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[(</span><span class="n">counter1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Add overlays by looping over cluster labels associated</span>
+        <span class="c1"># with each feature present in the input dataset</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">last_index</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">current_cluster_label</span> <span class="o">!=</span> <span class="n">cluster_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">with_overlay</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">upper_value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span>
+                        <span class="n">lower_value</span><span class="p">,</span>
+                        <span class="n">upper_value</span><span class="p">,</span>
+                        <span class="n">facecolor</span><span class="o">=</span><span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;overlay&quot;</span><span class="p">],</span>
+                        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">with_text</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                        <span class="n">x</span><span class="o">=</span><span class="n">x_offset</span><span class="p">,</span>
+                        <span class="c1"># Text placement</span>
+                        <span class="n">y</span><span class="o">=</span><span class="n">lower_value</span>
+                        <span class="o">+</span> <span class="p">(</span><span class="n">upper_value</span> <span class="o">-</span> <span class="n">lower_value</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+                        <span class="o">+</span> <span class="n">text_placement_offset</span><span class="p">,</span>
+                        <span class="n">s</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Cluster </span><span class="si">{</span><span class="n">current_cluster_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">,</span>
+                        <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">counter0</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">counter1</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[(</span><span class="n">counter1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]</span>
+                <span class="n">lower_value</span> <span class="o">=</span> <span class="n">upper_value</span>
+                <span class="n">upper_value</span> <span class="o">+=</span> <span class="mf">1.00</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">counter0</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">upper_value</span> <span class="o">+=</span> <span class="mf">1.00</span>
+            <span class="n">current_cluster_label</span> <span class="o">=</span> <span class="n">cluster_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">with_overlay</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span>
+                <span class="n">lower_value</span><span class="p">,</span>
+                <span class="n">upper_value</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;overlay&quot;</span><span class="p">],</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">with_text</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="n">x_offset</span><span class="p">,</span>
+                <span class="c1"># Text placement</span>
+                <span class="n">y</span><span class="o">=</span><span class="n">lower_value</span>
+                <span class="o">+</span> <span class="p">(</span><span class="n">upper_value</span> <span class="o">-</span> <span class="n">lower_value</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="o">+</span> <span class="n">text_placement_offset</span><span class="p">,</span>
+                <span class="n">s</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Cluster </span><span class="si">{</span><span class="n">current_cluster_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">,</span>
+                <span class="n">verticalalignment</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_add_feature_overlays</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
+        <span class="n">cluster_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cluster_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lower_value</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span>
+        <span class="n">upper_value</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">last_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cluster_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Opacity values associated with the two alternating overlays</span>
+        <span class="n">alphas</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]</span>
+
+        <span class="c1"># Values pertaining to first cluster overlay</span>
+        <span class="n">counter1</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[(</span><span class="n">counter1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Add overlays</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">last_index</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">upper_value</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span>
+                <span class="n">lower_value</span><span class="p">,</span>
+                <span class="n">upper_value</span><span class="p">,</span>
+                <span class="n">facecolor</span><span class="o">=</span><span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;overlay&quot;</span><span class="p">],</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">counter1</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[(</span><span class="n">counter1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">lower_value</span> <span class="o">=</span> <span class="n">upper_value</span>
+            <span class="n">upper_value</span> <span class="o">+=</span> <span class="mf">1.00</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axhspan</span><span class="p">(</span>
+            <span class="n">lower_value</span><span class="p">,</span>
+            <span class="n">upper_value</span><span class="p">,</span>
+            <span class="n">facecolor</span><span class="o">=</span><span class="n">MAIN_COLOR_PALETTE</span><span class="p">[</span><span class="s2">&quot;overlay&quot;</span><span class="p">],</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="plot_roc_curve"><a class="viewcode-back" href="../../source/api/plotting.html#shapfire.plotting.plot_roc_curve">[docs]</a><span class="k">def</span> <span class="nf">plot_roc_curve</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="n">plot_all_curves</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Axes</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="n">Axes</span><span class="p">]:</span>
+    <span class="c1"># Validate given input arguments</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># No axis was passed as function input argument. Thus create a new</span>
+        <span class="c1"># axis object</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Get figure from the Axes object so we can subsequently apply</span>
+        <span class="c1"># styling to it</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+
+    <span class="c1"># Set linewidths and alpha values for each of the lines in the ROC AUC</span>
+    <span class="c1"># plot</span>
+    <span class="n">line_linewidth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;line_linewidth&quot;</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">)</span>
+    <span class="n">line_alpha</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;line_alpha&quot;</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">)</span>
+    <span class="n">mean_linewidth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mean_linewidth&quot;</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">)</span>
+    <span class="n">mean_alpha</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mean_alpha&quot;</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">)</span>
+    <span class="n">fill_alpha</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_alpha&quot;</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
+
+    <span class="c1"># Make sure valid data pertaining to the &#39;roc_auc&#39; scoring function is</span>
+    <span class="c1"># actually available and set in the &#39;self.shapfire._history&#39; dataframe</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dict_</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">dict_</span><span class="p">[</span><span class="s2">&quot;fpr&quot;</span><span class="p">],</span> <span class="n">dict_</span><span class="p">[</span><span class="s2">&quot;tpr&quot;</span><span class="p">],</span> <span class="n">dict_</span><span class="p">[</span><span class="s2">&quot;roc_auc&quot;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;This plotting function can only be called if valid data &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;pertaining to the &#39;roc_auc&#39; score is availble..&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Apply default styling</span>
+    <span class="n">_apply_default_styling</span><span class="p">()</span>
+
+    <span class="c1"># Extract necessary data for plotting</span>
+    <span class="n">tprs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">aucs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">mean_fpr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1">#         for _, row in self.shapfire._history.iterrows():</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">score</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;score&quot;</span><span class="p">]</span>
+        <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">score</span><span class="p">[</span><span class="s2">&quot;fpr&quot;</span><span class="p">],</span> <span class="n">score</span><span class="p">[</span><span class="s2">&quot;tpr&quot;</span><span class="p">],</span> <span class="n">score</span><span class="p">[</span><span class="s2">&quot;roc_auc&quot;</span><span class="p">]</span>
+        <span class="c1"># Plot individual ROC lines</span>
+        <span class="k">if</span> <span class="n">plot_all_curves</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">_plot_roc_curve</span><span class="p">(</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">fpr</span><span class="o">=</span><span class="n">fpr</span><span class="p">,</span>
+                <span class="n">tpr</span><span class="o">=</span><span class="n">tpr</span><span class="p">,</span>
+                <span class="n">roc_auc</span><span class="o">=</span><span class="n">roc_auc</span><span class="p">,</span>
+                <span class="n">fold</span><span class="o">=</span><span class="n">counter</span><span class="p">,</span>
+                <span class="n">line_linewidth</span><span class="o">=</span><span class="n">line_linewidth</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+                <span class="n">line_alpha</span><span class="o">=</span><span class="n">line_alpha</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="p">)</span>
+        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Perform one-dimensional linear interpolation for monotonically</span>
+        <span class="c1"># increasing sample points</span>
+        <span class="n">interp_tpr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">mean_fpr</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="n">fpr</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">tpr</span><span class="p">)</span>
+        <span class="n">interp_tpr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">tprs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interp_tpr</span><span class="p">)</span>
+        <span class="n">aucs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roc_auc</span><span class="p">)</span>
+
+    <span class="c1"># Plot mean of ROC lines</span>
+    <span class="n">mean_tpr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tprs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">mean_tpr</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">mean_auc</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">mean_fpr</span><span class="p">,</span> <span class="n">mean_tpr</span><span class="p">)</span>
+    <span class="n">std_auc</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">aucs</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">mean_fpr</span><span class="p">,</span>
+        <span class="n">mean_tpr</span><span class="p">,</span>
+        <span class="n">lw</span><span class="o">=</span><span class="n">mean_linewidth</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">mean_alpha</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;Mean ROC (AUC = </span><span class="si">%0.2f</span><span class="s2"> $\pm$ </span><span class="si">%0.2f</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mean_auc</span><span class="p">,</span> <span class="n">std_auc</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Fill between ROC lines</span>
+    <span class="n">std_tpr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">tprs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">tprs_upper</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">mean_tpr</span> <span class="o">+</span> <span class="n">std_tpr</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">tprs_lower</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">mean_tpr</span> <span class="o">-</span> <span class="n">std_tpr</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">mean_fpr</span><span class="p">,</span>
+        <span class="n">y1</span><span class="o">=</span><span class="n">tprs_lower</span><span class="p">,</span>
+        <span class="n">y2</span><span class="o">=</span><span class="n">tprs_upper</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">fill_alpha</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$\pm$ 1 std. dev.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># Random classifier performance line</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;navy&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.25</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">top</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">left</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">bottom</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">trim</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Create a box to fill with legend entries</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="n">box</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">y0</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">box</span><span class="o">.</span><span class="n">height</span><span class="p">])</span>
+    <span class="n">ncols</span> <span class="o">=</span> <span class="n">_add_dummy_legend_entries</span><span class="p">(</span>
+        <span class="n">total_lines</span><span class="o">=</span><span class="n">counter</span><span class="p">,</span> <span class="n">lines_per_inch</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="p">)</span>
+    <span class="c1"># Put a legend to the right of the current axis</span>
+    <span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+        <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span>
+        <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">ncol</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span>
+        <span class="n">fancybox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">legend</span><span class="o">.</span><span class="n">get_lines</span><span class="p">():</span>
+        <span class="n">line</span><span class="o">.</span><span class="n">set_linewidth</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+
+    <span class="c1"># Make changes related to figure size, title, x-axis labels + ticks,</span>
+    <span class="c1"># y-axis labels + and ticks, etc.</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+
+    <span class="c1"># Position x and y labels manually</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="mf">0.010</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="s2">&quot;False positive rate&quot;</span><span class="p">,</span>
+        <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="s2">&quot;True positive rate&quot;</span><span class="p">,</span>
+        <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;ROC curves&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<span class="k">def</span> <span class="nf">_plot_roc_curve</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
+    <span class="n">fpr</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">tpr</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">roc_auc</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">fold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">line_linewidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.25</span><span class="p">,</span>
+    <span class="n">line_alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.30</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">fpr</span><span class="p">,</span>
+        <span class="n">tpr</span><span class="p">,</span>
+        <span class="n">lw</span><span class="o">=</span><span class="n">line_linewidth</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">line_alpha</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Fold </span><span class="si">{</span><span class="n">fold</span><span class="si">}</span><span class="s2">. ROC (AUC = </span><span class="si">{</span><span class="n">roc_auc</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span>
+
+
+<span class="k">def</span> <span class="nf">_add_dummy_legend_entries</span><span class="p">(</span>
+    <span class="n">total_lines</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">lines_per_inch</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">lines_per_inch</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">total_space</span> <span class="o">=</span> <span class="n">figsize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lines_per_inch</span>
+    <span class="n">ncols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">total_lines</span> <span class="o">/</span> <span class="n">total_space</span><span class="p">))</span>
+    <span class="n">dummy_lines</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">total_space</span> <span class="o">-</span> <span class="p">(</span><span class="n">total_lines</span> <span class="o">%</span> <span class="n">total_space</span><span class="p">))</span>
+    <span class="c1"># Add additional dummy legend entries to fill empty space</span>
+    <span class="c1"># in the displayed legend</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dummy_lines</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ncols</span>
+
+
+<span class="k">def</span> <span class="nf">_apply_default_styling</span><span class="p">(</span>
+    <span class="n">rcParams</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># Apply default styling to the generated plots</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rcParams</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mpl</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rcParams</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s2">&quot;paper&quot;</span><span class="p">,</span> <span class="n">rc</span><span class="o">=</span><span class="n">DEFAULT_PLOTTING_SETTINGS</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_set_figure_size</span><span class="p">(</span>
+    <span class="n">figsize</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="n">fig</span><span class="p">:</span> <span class="n">Figure</span><span class="p">,</span>
+    <span class="n">num_all_subsets</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">num_all_features</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_figsize</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Figure</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+    <span class="k">if</span> <span class="n">figsize</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">num_all_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">num_all_features</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">num_all_subsets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">width</span> <span class="o">=</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">num_all_subsets</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">width</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">height</span>
+            <span class="k">if</span> <span class="n">default_figsize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">default_figsize</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">default_figsize</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The given input argument &#39;num_all_features&#39; and &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;&#39;figsize&#39; is None. If &#39;figsize&#39; is None, then &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;&#39;num_all_features&#39; needs to be an integer value &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;larger than 0.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">figsize</span>
+</code></pre></div>
+
+
+  <hr>
+<div class="md-source-file">
+  <small>
+
+      Last update:
+      Jun 12, 2022
+
+  </small>
+</div>
+
+
+            </article>
+          </div>
+        </div>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+  <div class="md-footer-meta md-typeset">
+
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+    <div class="md-footer-copyright__highlight">
+        &#169; Copyright 2022, NicklasXYZ.
+
+    </div>
+
+    Created using
+    <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
+    5.0.1.
+     and
+    <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
+
+</div>
+
+    </div>
+
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["toc.integrate", "navigation.sections", "search.share"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": null, "versionPath": null}}</script>
+
+
+      <script src="../../_static/javascripts/bundle.37d1338f.min.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+
+  </body>
+</html>

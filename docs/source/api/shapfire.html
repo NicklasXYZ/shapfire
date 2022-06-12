@@ -1,0 +1,983 @@
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+
+      <link rel="icon" href="../../_static/favicon.ico">
+
+
+
+        <title>shapfire.shapfire - ShapFire</title>
+
+
+
+      <link rel="stylesheet" href="../../_static/stylesheets/main.8674dc46.min.css">
+
+
+        <link rel="stylesheet" href="../../_static/stylesheets/palette.92c9fe4a.min.css">
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+        <link rel="stylesheet" type="text/css" href="../../_static/extra_cssv2.css" />
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan">
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#shapfire.shapfire.DEFAULT_REPEATS" class="md-skip">
+          Skip to content
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+
+        </aside>
+      </div>
+
+
+
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../index.html" title="ShapFire" class="md-header__button md-logo" aria-label="ShapFire" data-md-component="logo">
+      <img src="../../_static/fire.svg" alt="logo">
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ShapFire
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              shapfire.shapfire
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+      <form class="md-header__option" data-md-component="palette">
+
+
+
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+
+
+      </form>
+
+
+
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <div class="md-header__source">
+        <a href="https://github.com/nicklasxyz/shapfire/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ShapFire
+  </div>
+</a>
+      </div>
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="ShapFire" class="md-nav__button md-logo" aria-label="ShapFire" data-md-component="logo">
+      <img src="../../_static/fire.svg" alt="logo">
+    </a>
+    ShapFire
+  </label>
+
+    <div class="md-nav__source">
+      <a href="https://github.com/nicklasxyz/shapfire/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ShapFire
+  </div>
+</a>
+    </div>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        <span title="index (document)" class="md-ellipsis">About</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../examples/index.html" class="md-nav__link">
+        <span title="source/examples/index (document)" class="md-ellipsis">Examples</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+
+
+
+
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="api_reference.html"><span title="source/api/api_reference (document)" class="md-ellipsis">API Reference</span></a>
+
+            <label for="__nav_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+
+        </div>
+
+      <nav class="md-nav" aria-label="API Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          <span title="source/api/api_reference (document)" class="md-ellipsis">API Reference</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          <span title="source/api/shapfire (document)" class="md-ellipsis">shapfire.<wbr>shapfire</span>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="" class="md-nav__link md-nav__link--active">
+        <span title="source/api/shapfire (document)" class="md-ellipsis">shapfire.<wbr>shapfire</span>
+      </a>
+
+
+
+
+
+<nav class="md-nav md-nav--secondary">
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      <span title="source/api/shapfire (document)" class="md-ellipsis">shapfire.<wbr>shapfire</span>
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.shapfire.DEFAULT_REPEATS" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.shapfire.DEFAULT_REPEATS (Python data) — The number of times, in a cross-validation, the division of a dataset into a certain number of folds should be repeated." class="md-ellipsis">shapfire.<wbr>shapfire.<wbr>DEFAULT_<wbr>REPEATS</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.shapfire.DEFAULT_SPLITS" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.shapfire.DEFAULT_SPLITS (Python data) — The default number of folds a dataset should be divided into in a cross-validation." class="md-ellipsis">shapfire.<wbr>shapfire.<wbr>DEFAULT_<wbr>SPLITS</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.ShapFire" class="md-nav__link">
+    <span aria-label="Python class" class="objinfo-icon objinfo-icon__data" title="Python class">C</span><span title="shapfire.ShapFire (Python class) — The main class used for applying SHAP feature importance rank ensembling for feature selection." class="md-ellipsis">shapfire.<wbr>Shap<wbr>Fire</span>
+  </a>
+
+    <nav class="md-nav" aria-label="shapfire.ShapFire">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire-parameters" class="md-nav__link">
+    <span class="md-ellipsis">Parameters</span>
+  </a>
+
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.estimator_class" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.estimator_class (Python parameter) — The scikit-learn or Microsoft LightGBM                 tree-based estimator to use. The estimator can either be a                 classifier or a regressor." class="md-ellipsis">estimator_<wbr>class</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.scoring" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.scoring (Python parameter) — The specification of a scoring function to use for                 model-evaluation, i.e., a function that can be used for                 assessing the prediction error of a trained model given a test                 set." class="md-ellipsis">scoring</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.estimator_params" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.estimator_params (Python parameter) — The estimator hyperparameters and corresponding                 values to search or directly use. If only a single value for                 each hyperparameter is provided then only cross-validation                 will be performed and no hyperparameter search will be                 performed. Defaults to None." class="md-ellipsis">estimator_<wbr>params</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.n_splits" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.n_splits (Python parameter) — The number of folds to generate in the outer loop                 of a nested cross-validation. Defaults to                     shapfire.shapfire.DEFAULT_SPLITS." class="md-ellipsis">n_<wbr>splits</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.n_repeats" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.n_repeats (Python parameter) — The number of new folds that should be generated                 in the outer loop of a nested cross-validation. Defaults to                     shapfire.shapfire.DEFAULT_REPEATS." class="md-ellipsis">n_<wbr>repeats</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.random_seed" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.random_seed (Python parameter) — The random seed to use for reproducibility purposes.                 Defaults to shapfire.utils.DEFAULT_RANDOM_SEED." class="md-ellipsis">random_<wbr>seed</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.iterations" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.iterations (Python parameter) — The number of feature subsets to sample and subsequently use for model-training such that SHAP feature importance values can be extracted. Defaults to None which in turns sets the number of iterations to the size of the largest cluster of highly associated features found." class="md-ellipsis">iterations</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.reference" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.reference (Python parameter) — The data fusion method to use for producing a reference vector. Defaults to &#34;mean&#34;." class="md-ellipsis">reference</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.n_samples" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.n_samples (Python parameter) — The number of random samples of rank permutations to use in a batch. Several batches of random samples are used to estimate a &#34;ranking distribution&#34; which in turn is used to determine a feature importance cut-off threshold. Defaults to 1000." class="md-ellipsis">n_<wbr>samples</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.__init__.n_batches" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.__init__.n_batches (Python parameter) — The number of batches of random samples that should be used to estimate a &#34;ranking distribution&#34; which in turn is used to determine a feature importance cut-off threshold. Defaults to 250." class="md-ellipsis">n_<wbr>batches</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.ranked_differences" class="md-nav__link">
+    <span aria-label="Python attribute" class="objinfo-icon objinfo-icon__alias" title="Python attribute">A</span><span title="shapfire.ShapFire.ranked_differences (Python attribute) — A class attribute and pandas dataframe that specifies the final importance values associated with each of the features in the given input dataset." class="md-ellipsis">ranked_<wbr>differences</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.selected_features" class="md-nav__link">
+    <span aria-label="Python attribute" class="objinfo-icon objinfo-icon__alias" title="Python attribute">A</span><span title="shapfire.ShapFire.selected_features (Python attribute) — A ShapFire class attribute and list that specifies the final feature subset selected by ShapFire and which is expected to achieve the best possible model performance." class="md-ellipsis">selected_<wbr>features</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit" class="md-nav__link">
+    <span aria-label="Python method" class="objinfo-icon objinfo-icon__procedure" title="Python method">M</span><span title="shapfire.ShapFire.fit (Python method) — Perform SHAP feature importance rank ensembling for the purpose of ranking and selecting the features that can be said to be the most important for a certain prediction task at hand." class="md-ellipsis">fit</span>
+  </a>
+
+    <nav class="md-nav" aria-label="fit">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit-parameters" class="md-nav__link">
+    <span class="md-ellipsis">Parameters</span>
+  </a>
+
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit.X" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.fit.X (Python parameter) — An input dataset that the ShapFire method should be applied to.                 The dataset is assumed to contain features (columns) and                 corresponding observations (rows)." class="md-ellipsis">X</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit.y" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.fit.y (Python parameter) — The samples associated with the target variable of the dataset." class="md-ellipsis">y</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit-returns" class="md-nav__link">
+    <span class="md-ellipsis">Returns</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.transform" class="md-nav__link">
+    <span aria-label="Python method" class="objinfo-icon objinfo-icon__procedure" title="Python method">M</span><span title="shapfire.ShapFire.transform (Python method) — Reduce the input dataset X containing features (columns) and corresponding observations (rows), to only the columns of features selected by ShapFire." class="md-ellipsis">transform</span>
+  </a>
+
+    <nav class="md-nav" aria-label="transform">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.transform-parameters" class="md-nav__link">
+    <span class="md-ellipsis">Parameters</span>
+  </a>
+
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.transform.X" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.transform.X (Python parameter) — The original input dataset that the ShapFire method was applied                 to. The dataset is assumed to contain features (columns) and                 corresponding observations (rows)." class="md-ellipsis">X</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.transform-raises" class="md-nav__link">
+    <span class="md-ellipsis">Raises</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.transform-returns" class="md-nav__link">
+    <span class="md-ellipsis">Returns</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit_transform" class="md-nav__link">
+    <span aria-label="Python method" class="objinfo-icon objinfo-icon__procedure" title="Python method">M</span><span title="shapfire.ShapFire.fit_transform (Python method) — Perform SHAP feature importance rank ensembling for the purpose of selecting the features that are the most important. Subsequently, reduce the input dataset &#39;X&#39; to only the columns of the selected features." class="md-ellipsis">fit_<wbr>transform</span>
+  </a>
+
+    <nav class="md-nav" aria-label="fit_transform">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit_transform-parameters" class="md-nav__link">
+    <span class="md-ellipsis">Parameters</span>
+  </a>
+
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit_transform.X" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.fit_transform.X (Python parameter) — An input dataset that the ShapFire method should be applied to.                 The dataset is assumed to contain features (columns) and                 corresponding observations (rows)." class="md-ellipsis">X</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit_transform.y" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.fit_transform.y (Python parameter) — The samples associated with the target variable of the dataset." class="md-ellipsis">y</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.fit_transform-returns" class="md-nav__link">
+    <span class="md-ellipsis">Returns</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking" class="md-nav__link">
+    <span aria-label="Python method" class="objinfo-icon objinfo-icon__procedure" title="Python method">M</span><span title="shapfire.ShapFire.plot_ranking (Python method) — Plot the feature importance scores associated with each feature. The features will be ordered in the figure from best to worst and possibly according to which cluster they each belong to." class="md-ellipsis">plot_<wbr>ranking</span>
+  </a>
+
+    <nav class="md-nav" aria-label="plot_ranking">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking-parameters" class="md-nav__link">
+    <span class="md-ellipsis">Parameters</span>
+  </a>
+
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking.groupby" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.plot_ranking.groupby (Python parameter) — A string value indicating how the feature importance                 ranking should be displayed in a figure. If the option                 &#39;cluster&#39; is chosen, then the features are grouped and                 shown in the figure based on their assigned cluster and                 according to the importance rank of the best feautre in the                 cluster. If &#39;feature&#39; is chosen, then the features are                 shown in the figure purely according to their global rank                 without any consideration to what cluster each features are a                 part of." class="md-ellipsis">groupby</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking.figsize" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.plot_ranking.figsize (Python parameter) — The width and height of the figure in inches. Defaults to                 None." class="md-ellipsis">figsize</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking.fontsize" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.plot_ranking.fontsize (Python parameter) — The size of the font present in the figure. Defaults to                 10." class="md-ellipsis">fontsize</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking.with_text" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.plot_ranking.with_text (Python parameter) — If input argument groupby is set to                 &#39;cluster&#39;, then with_text determines whether                 features that have been grouped in the figure by the cluster                 they each belong to, should also be annotated with a text                 label. Defaults to True." class="md-ellipsis">with_<wbr>text</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking.with_overlay" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.plot_ranking.with_overlay (Python parameter) — Depending on whether groupby is set to                 &#39;cluster&#39; or &#39;feature&#39;, groups of features or individual                 features are assigned a gray-scale overlay creating a visual                 grouping / delimitation of features. Defaults to True." class="md-ellipsis">with_<wbr>overlay</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking.ax" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.ShapFire.plot_ranking.ax (Python parameter) — A Matplotlib Axes object. Defaults to None." class="md-ellipsis">ax</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.ShapFire.plot_ranking-returns" class="md-nav__link">
+    <span class="md-ellipsis">Returns</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="plotting.html" class="md-nav__link">
+        <span title="source/api/plotting (document)" class="md-ellipsis">shapfire.<wbr>plotting</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="utils.html" class="md-nav__link">
+        <span title="source/api/utils (document)" class="md-ellipsis">shapfire.<wbr>utils</span>
+      </a>
+    </li>
+
+
+
+
+        </ul>
+      </nav>
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset" role="main">
+
+  <a href="https://github.com/nicklasxyz/shapfire/blob/main/docs/source/api/shapfire.rst" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+  <h1 id="module-shapfire.shapfire"><span id="shapfire-shapfire"></span><code class="docutils literal notranslate"><span class="pre">shapfire.shapfire</span></code><a class="headerlink" href="#module-shapfire.shapfire" title="Permalink to this heading">¶</a></h1>
+<p>This module contains the main implementation of the ShapFire method for
+feature ranking and selection.</p>
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.shapfire.DEFAULT_REPEATS">
+<span class="sig-prename descclassname"><span class="pre">shapfire.shapfire.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_REPEATS</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="mi">1</span></code><a class="headerlink" href="#shapfire.shapfire.DEFAULT_REPEATS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of times, in a cross-validation, the division of a dataset into a
+certain number of folds should be repeated.</p>
+</dd></dl>
+
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.shapfire.DEFAULT_SPLITS">
+<span class="sig-prename descclassname"><span class="pre">shapfire.shapfire.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_SPLITS</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="mi">2</span></code><a class="headerlink" href="#shapfire.shapfire.DEFAULT_SPLITS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default number of folds a dataset should be divided into in a
+cross-validation.</p>
+</dd></dl>
+
+<dl class="py class objdesc">
+<dt class="sig sig-object highlight sig-wrap py" id="shapfire.ShapFire">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shapfire.</span></span><span class="sig-name descname"><span class="pre">ShapFire</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.estimator_class" title="shapfire.ShapFire.__init__.estimator_class (Python parameter) — The scikit-learn or Microsoft LightGBM                 tree-based estimator to use. The estimator can either be a                 classifier or a regressor."><span class="n"><span class="pre">estimator_class</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm.LGBMClassifier" title="(in LightGBM v3.3.2.99)"><span class="pre">LGBMClassifier</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMRegressor.html#lightgbm.LGBMRegressor" title="(in LightGBM v3.3.2.99)"><span class="pre">LGBMRegressor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier" title="(in scikit-learn v1.1)"><span class="pre">RandomForestClassifier</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="(in scikit-learn v1.1)"><span class="pre">RandomForestRegressor</span></a></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.scoring" title="shapfire.ShapFire.__init__.scoring (Python parameter) — The specification of a scoring function to use for                 model-evaluation, i.e., a function that can be used for                 assessing the prediction error of a trained model given a test                 set."><span class="n"><span class="pre">scoring</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.estimator_params" title="shapfire.ShapFire.__init__.estimator_params (Python parameter) — The estimator hyperparameters and corresponding                 values to search or directly use. If only a single value for                 each hyperparameter is provided then only cross-validation                 will be performed and no hyperparameter search will be                 performed. Defaults to None."><span class="n"><span class="pre">estimator_params</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.n_splits" title="shapfire.ShapFire.__init__.n_splits (Python parameter) — The number of folds to generate in the outer loop                 of a nested cross-validation. Defaults to                     shapfire.shapfire.DEFAULT_SPLITS."><span class="n"><span class="pre">n_splits</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">DEFAULT_SPLITS</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.n_repeats" title="shapfire.ShapFire.__init__.n_repeats (Python parameter) — The number of new folds that should be generated                 in the outer loop of a nested cross-validation. Defaults to                     shapfire.shapfire.DEFAULT_REPEATS."><span class="n"><span class="pre">n_repeats</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">DEFAULT_REPEATS</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.random_seed" title="shapfire.ShapFire.__init__.random_seed (Python parameter) — The random seed to use for reproducibility purposes.                 Defaults to shapfire.utils.DEFAULT_RANDOM_SEED."><span class="n"><span class="pre">random_seed</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">utils</span><span class="o">.</span><span class="n">DEFAULT_RANDOM_SEED</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.iterations" title="shapfire.ShapFire.__init__.iterations (Python parameter) — The number of feature subsets to sample and subsequently use for model-training such that SHAP feature importance values can be extracted. Defaults to None which in turns sets the number of iterations to the size of the largest cluster of highly associated features found."><span class="n"><span class="pre">iterations</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.reference" title="shapfire.ShapFire.__init__.reference (Python parameter) — The data fusion method to use for producing a reference vector. Defaults to &quot;mean&quot;."><span class="n"><span class="pre">reference</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="s1">&#39;mean&#39;</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.n_samples" title="shapfire.ShapFire.__init__.n_samples (Python parameter) — The number of random samples of rank permutations to use in a batch. Several batches of random samples are used to estimate a &quot;ranking distribution&quot; which in turn is used to determine a feature importance cut-off threshold. Defaults to 1000."><span class="n"><span class="pre">n_samples</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="mi">1000</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.__init__.n_batches" title="shapfire.ShapFire.__init__.n_batches (Python parameter) — The number of batches of random samples that should be used to estimate a &quot;ranking distribution&quot; which in turn is used to determine a feature importance cut-off threshold. Defaults to 250."><span class="n"><span class="pre">n_batches</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="mi">250</span></code></em></span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/shapfire/shapfire.html#ShapFire"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shapfire.ShapFire" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main class used for applying SHAP feature importance rank ensembling
+for feature selection.</p>
+<dl class="field-list simple">
+<dt class="field-odd" id="shapfire.ShapFire-parameters">Parameters<a class="headerlink" href="#shapfire.ShapFire-parameters" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple api-field highlight">
+<dt id="shapfire.ShapFire.__init__.estimator_class"><span class="n sig-name">estimator_class</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMClassifier.html#lightgbm.LGBMClassifier" title="(in LightGBM v3.3.2.99)">LGBMClassifier</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://lightgbm.readthedocs.io/en/latest/pythonapi/lightgbm.LGBMRegressor.html#lightgbm.LGBMRegressor" title="(in LightGBM v3.3.2.99)">LGBMRegressor</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html#sklearn.ensemble.RandomForestClassifier" title="(in scikit-learn v1.1)">RandomForestClassifier</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="(in scikit-learn v1.1)">RandomForestRegressor</a></span></span><a class="headerlink" href="#shapfire.ShapFire.__init__.estimator_class" title="Permalink to this definition">¶</a></dt><dd><p>The scikit-learn or Microsoft LightGBM                 tree-based estimator to use. The estimator can either be a                 classifier or a regressor.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.scoring"><span class="n sig-name">scoring</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></span></span><a class="headerlink" href="#shapfire.ShapFire.__init__.scoring" title="Permalink to this definition">¶</a></dt><dd><p>The specification of a scoring function to use for                 model-evaluation, i.e., a function that can be used for                 assessing the prediction error of a trained model given a test                 set.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.estimator_params"><span class="n sig-name">estimator_params</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)">None</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a><span class="p">,</span><span class="w">   </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)">Any</a><span class="p">]</span></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#shapfire.ShapFire.__init__.estimator_params" title="Permalink to this definition">¶</a></dt><dd><p>The estimator hyperparameters and corresponding                 values to search or directly use. If only a single value for                 each hyperparameter is provided then only cross-validation                 will be performed and no hyperparameter search will be                 performed. Defaults to None.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.n_splits"><span class="n sig-name">n_splits</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">DEFAULT_SPLITS</span></code><a class="headerlink" href="#shapfire.ShapFire.__init__.n_splits" title="Permalink to this definition">¶</a></dt><dd><p>The number of folds to generate in the outer loop                 of a nested cross-validation. Defaults to                     <a class="reference internal" href="#shapfire.shapfire.DEFAULT_SPLITS" title="shapfire.shapfire.DEFAULT_SPLITS (Python data) — The default number of folds a dataset should be divided into in a cross-validation."><code class="xref py py-const docutils literal notranslate"><span class="pre">shapfire.shapfire.DEFAULT_SPLITS</span></code></a>.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.n_repeats"><span class="n sig-name">n_repeats</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">DEFAULT_REPEATS</span></code><a class="headerlink" href="#shapfire.ShapFire.__init__.n_repeats" title="Permalink to this definition">¶</a></dt><dd><p>The number of new folds that should be generated                 in the outer loop of a nested cross-validation. Defaults to                     <a class="reference internal" href="#shapfire.shapfire.DEFAULT_REPEATS" title="shapfire.shapfire.DEFAULT_REPEATS (Python data) — The number of times, in a cross-validation, the division of a dataset into a certain number of folds should be repeated."><code class="xref py py-const docutils literal notranslate"><span class="pre">shapfire.shapfire.DEFAULT_REPEATS</span></code></a>.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.random_seed"><span class="n sig-name">random_seed</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">utils</span><span class="o">.</span><span class="n">DEFAULT_RANDOM_SEED</span></code><a class="headerlink" href="#shapfire.ShapFire.__init__.random_seed" title="Permalink to this definition">¶</a></dt><dd><p>The random seed to use for reproducibility purposes.                 Defaults to <a class="reference internal" href="utils.html#shapfire.utils.DEFAULT_RANDOM_SEED" title="shapfire.utils.DEFAULT_RANDOM_SEED (Python data) — The default random seed used across modules."><code class="xref py py-const docutils literal notranslate"><span class="pre">shapfire.utils.DEFAULT_RANDOM_SEED</span></code></a>.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.iterations"><span class="n sig-name">iterations</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)">None</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#shapfire.ShapFire.__init__.iterations" title="Permalink to this definition">¶</a></dt><dd><p>The number of feature subsets to sample and subsequently
+use for model-training such that SHAP feature importance values
+can be extracted. Defaults to None which in turns sets the
+number of iterations to the size of the largest cluster of
+highly associated features found.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.reference"><span class="n sig-name">reference</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="s1">&#39;mean&#39;</span></code><a class="headerlink" href="#shapfire.ShapFire.__init__.reference" title="Permalink to this definition">¶</a></dt><dd><p>The data fusion method to use for producing a reference
+vector. Defaults to “mean”.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.n_samples"><span class="n sig-name">n_samples</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="mi">1000</span></code><a class="headerlink" href="#shapfire.ShapFire.__init__.n_samples" title="Permalink to this definition">¶</a></dt><dd><p>The number of random samples of rank permutations to use
+in a batch. Several batches of random samples are used to
+estimate a “ranking distribution” which in turn is used to
+determine a feature importance cut-off threshold. Defaults to
+1000.</p>
+</dd>
+<dt id="shapfire.ShapFire.__init__.n_batches"><span class="n sig-name">n_batches</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="mi">250</span></code><a class="headerlink" href="#shapfire.ShapFire.__init__.n_batches" title="Permalink to this definition">¶</a></dt><dd><p>The number of batches of random samples that should be
+used to estimate a “ranking distribution” which in turn is used
+to determine a feature importance cut-off threshold. Defaults to
+250.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.ShapFire.ranked_differences">
+<span class="sig-name descname"><span class="pre">ranked_differences</span></span><a class="headerlink" href="#shapfire.ShapFire.ranked_differences" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class attribute and pandas dataframe that
+specifies the final importance values associated with each
+of the features in the given input dataset.</p>
+</dd></dl>
+
+<dl class="py attribute objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.ShapFire.selected_features">
+<span class="sig-name descname"><span class="pre">selected_features</span></span><a class="headerlink" href="#shapfire.ShapFire.selected_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>A ShapFire class attribute and list that
+specifies the final feature subset selected by ShapFire and
+which is expected to achieve the best possible model
+performance.</p>
+</dd></dl>
+
+<dl class="py method objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.ShapFire.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.fit.X" title="shapfire.ShapFire.fit.X (Python parameter) — An input dataset that the ShapFire method should be applied to.                 The dataset is assumed to contain features (columns) and                 corresponding observations (rows)."><span class="n"><span class="pre">X</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.fit.y" title="shapfire.ShapFire.fit.y (Python parameter) — The samples associated with the target variable of the dataset."><span class="n"><span class="pre">y</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></em></span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="desctype"><a class="reference internal" href="#shapfire.ShapFire" title="shapfire.shapfire.ShapFire (Python class)"><span class="pre">ShapFire</span></a></span></span></span><a class="reference internal" href="../../_modules/shapfire/shapfire.html#ShapFire.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shapfire.ShapFire.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform SHAP feature importance rank ensembling for the purpose of
+ranking and selecting the features that can be said to be the most
+important for a certain prediction task at hand.</p>
+<dl class="field-list simple">
+<dt class="field-odd" id="shapfire.ShapFire.fit-parameters">Parameters<a class="headerlink" href="#shapfire.ShapFire.fit-parameters" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple api-field highlight">
+<dt id="shapfire.ShapFire.fit.X"><span class="n sig-name">X</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">ndarray</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)">DataFrame</a></span></span><a class="headerlink" href="#shapfire.ShapFire.fit.X" title="Permalink to this definition">¶</a></dt><dd><p>An input dataset that the ShapFire method should be applied to.                 The dataset is assumed to contain features (columns) and                 corresponding observations (rows).</p>
+</dd>
+<dt id="shapfire.ShapFire.fit.y"><span class="n sig-name">y</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">ndarray</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)">DataFrame</a></span></span><a class="headerlink" href="#shapfire.ShapFire.fit.y" title="Permalink to this definition">¶</a></dt><dd><p>The samples associated with the target variable of the dataset.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even" id="shapfire.ShapFire.fit-returns">Returns<a class="headerlink" href="#shapfire.ShapFire.fit-returns" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-even"><p>A ShapFire object containing the necessary data associated with                 the most important features of the given input dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.ShapFire.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.transform.X" title="shapfire.ShapFire.transform.X (Python parameter) — The original input dataset that the ShapFire method was applied                 to. The dataset is assumed to contain features (columns) and                 corresponding observations (rows)."><span class="n"><span class="pre">X</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></em></span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></span><a class="reference internal" href="../../_modules/shapfire/shapfire.html#ShapFire.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shapfire.ShapFire.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduce the input dataset X containing features (columns) and
+corresponding observations (rows), to only the columns of features
+selected by ShapFire.</p>
+<dl class="field-list simple">
+<dt class="field-odd" id="shapfire.ShapFire.transform-parameters">Parameters<a class="headerlink" href="#shapfire.ShapFire.transform-parameters" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple api-field highlight">
+<dt id="shapfire.ShapFire.transform.X"><span class="n sig-name">X</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">ndarray</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)">DataFrame</a></span></span><a class="headerlink" href="#shapfire.ShapFire.transform.X" title="Permalink to this definition">¶</a></dt><dd><p>The original input dataset that the ShapFire method was applied                 to. The dataset is assumed to contain features (columns) and                 corresponding observations (rows).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even" id="shapfire.ShapFire.transform-raises">Raises<a class="headerlink" href="#shapfire.ShapFire.transform-raises" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the <a class="reference internal" href="#shapfire.ShapFire.fit" title="shapfire.ShapFire.fit (Python method) — Perform SHAP feature importance rank ensembling for the purpose of ranking and selecting the features that can be said to be the most important for a certain prediction task at hand."><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> method has not yet been called.</p>
+</dd>
+<dt class="field-odd" id="shapfire.ShapFire.transform-returns">Returns<a class="headerlink" href="#shapfire.ShapFire.transform-returns" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-odd"><p>A reduced dataset that only contains the most important features                 (columns).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method objdesc">
+<dt class="sig sig-object highlight sig-wrap py" id="shapfire.ShapFire.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.fit_transform.X" title="shapfire.ShapFire.fit_transform.X (Python parameter) — An input dataset that the ShapFire method should be applied to.                 The dataset is assumed to contain features (columns) and                 corresponding observations (rows)."><span class="n"><span class="pre">X</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.fit_transform.y" title="shapfire.ShapFire.fit_transform.y (Python parameter) — The samples associated with the target variable of the dataset."><span class="n"><span class="pre">y</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></em></span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)"><span class="pre">ndarray</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></span><a class="reference internal" href="../../_modules/shapfire/shapfire.html#ShapFire.fit_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shapfire.ShapFire.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform SHAP feature importance rank ensembling for the purpose of
+selecting the features that are the most important. Subsequently, reduce
+the input dataset ‘X’ to only the columns of the selected features.</p>
+<dl class="field-list simple">
+<dt class="field-odd" id="shapfire.ShapFire.fit_transform-parameters">Parameters<a class="headerlink" href="#shapfire.ShapFire.fit_transform-parameters" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple api-field highlight">
+<dt id="shapfire.ShapFire.fit_transform.X"><span class="n sig-name">X</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">ndarray</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)">DataFrame</a></span></span><a class="headerlink" href="#shapfire.ShapFire.fit_transform.X" title="Permalink to this definition">¶</a></dt><dd><p>An input dataset that the ShapFire method should be applied to.                 The dataset is assumed to contain features (columns) and                 corresponding observations (rows).</p>
+</dd>
+<dt id="shapfire.ShapFire.fit_transform.y"><span class="n sig-name">y</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.22)">ndarray</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)">DataFrame</a></span></span><a class="headerlink" href="#shapfire.ShapFire.fit_transform.y" title="Permalink to this definition">¶</a></dt><dd><p>The samples associated with the target variable of the dataset.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even" id="shapfire.ShapFire.fit_transform-returns">Returns<a class="headerlink" href="#shapfire.ShapFire.fit_transform-returns" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-even"><p>A reduced dataset that only contains the data associated with the                 most important features.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method objdesc">
+<dt class="sig sig-object highlight sig-wrap py" id="shapfire.ShapFire.plot_ranking">
+<span class="sig-name descname"><span class="pre">plot_ranking</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.plot_ranking.groupby" title="shapfire.ShapFire.plot_ranking.groupby (Python parameter) — A string value indicating how the feature importance                 ranking should be displayed in a figure. If the option                 'cluster' is chosen, then the features are grouped and                 shown in the figure based on their assigned cluster and                 according to the importance rank of the best feautre in the                 cluster. If 'feature' is chosen, then the features are                 shown in the figure purely according to their global rank                 without any consideration to what cluster each features are a                 part of."><span class="n"><span class="pre">groupby</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="s1">&#39;cluster&#39;</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><span class="n"><span class="pre">rcParams</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.plot_ranking.figsize" title="shapfire.ShapFire.plot_ranking.figsize (Python parameter) — The width and height of the figure in inches. Defaults to                 None."><span class="n"><span class="pre">figsize</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.plot_ranking.fontsize" title="shapfire.ShapFire.plot_ranking.fontsize (Python parameter) — The size of the font present in the figure. Defaults to                 10."><span class="n"><span class="pre">fontsize</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="mi">10</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.plot_ranking.with_text" title="shapfire.ShapFire.plot_ranking.with_text (Python parameter) — If input argument groupby is set to                 'cluster', then with_text determines whether                 features that have been grouped in the figure by the cluster                 they each belong to, should also be annotated with a text                 label. Defaults to True."><span class="n"><span class="pre">with_text</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">True</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.plot_ranking.with_overlay" title="shapfire.ShapFire.plot_ranking.with_overlay (Python parameter) — Depending on whether groupby is set to                 'cluster' or 'feature', groups of features or individual                 features are assigned a gray-scale overlay creating a visual                 grouping / delimitation of features. Defaults to True."><span class="n"><span class="pre">with_overlay</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">True</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.ShapFire.plot_ranking.ax" title="shapfire.ShapFire.plot_ranking.ax (Python parameter) — A Matplotlib Axes object. Defaults to None."><span class="n"><span class="pre">ax</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://matplotlib.org/stable/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.5.2)"><span class="pre">Axes</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code></em></span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure" title="(in Matplotlib v3.5.2)"><span class="pre">matplotlib.figure.Figure</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://matplotlib.org/stable/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.5.2)"><span class="pre">matplotlib.axes._axes.Axes</span></a><span class="p"><span class="pre">]</span></span></span></span></span><a class="reference internal" href="../../_modules/shapfire/shapfire.html#ShapFire.plot_ranking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shapfire.ShapFire.plot_ranking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the feature importance scores associated with each feature. The
+features will be ordered in the figure from best to worst and possibly
+according to which cluster they each belong to.</p>
+<dl class="field-list simple">
+<dt class="field-odd" id="shapfire.ShapFire.plot_ranking-parameters">Parameters<a class="headerlink" href="#shapfire.ShapFire.plot_ranking-parameters" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple api-field highlight">
+<dt id="shapfire.ShapFire.plot_ranking.groupby"><span class="n sig-name">groupby</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="s1">&#39;cluster&#39;</span></code><a class="headerlink" href="#shapfire.ShapFire.plot_ranking.groupby" title="Permalink to this definition">¶</a></dt><dd><p>A string value indicating how the feature importance                 ranking should be displayed in a figure. If the option                 ‘cluster’ is chosen, then the features are grouped and                 shown in the figure based on their assigned cluster and                 according to the importance rank of the best feautre in the                 cluster. If ‘feature’ is chosen, then the features are                 shown in the figure purely according to their global rank                 without any consideration to what cluster each features are a                 part of.</p>
+</dd>
+<dt id="shapfire.ShapFire.plot_ranking.figsize"><span class="n sig-name">figsize</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)">None</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)">tuple</a><span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a><span class="p">,</span><span class="w">   </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a><span class="p">]</span></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#shapfire.ShapFire.plot_ranking.figsize" title="Permalink to this definition">¶</a></dt><dd><p>The width and height of the figure in inches. Defaults to                 None.</p>
+</dd>
+<dt id="shapfire.ShapFire.plot_ranking.fontsize"><span class="n sig-name">fontsize</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="mi">10</span></code><a class="headerlink" href="#shapfire.ShapFire.plot_ranking.fontsize" title="Permalink to this definition">¶</a></dt><dd><p>The size of the font present in the figure. Defaults to                 10.</p>
+</dd>
+<dt id="shapfire.ShapFire.plot_ranking.with_text"><span class="n sig-name">with_text</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">True</span></code><a class="headerlink" href="#shapfire.ShapFire.plot_ranking.with_text" title="Permalink to this definition">¶</a></dt><dd><p>If input argument <code class="code docutils literal notranslate"><span class="pre">groupby</span></code> is set to                 ‘cluster’, then <code class="code docutils literal notranslate"><span class="pre">with_text</span></code> determines whether                 features that have been grouped in the figure by the cluster                 they each belong to, should also be annotated with a text                 label. Defaults to True.</p>
+</dd>
+<dt id="shapfire.ShapFire.plot_ranking.with_overlay"><span class="n sig-name">with_overlay</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">True</span></code><a class="headerlink" href="#shapfire.ShapFire.plot_ranking.with_overlay" title="Permalink to this definition">¶</a></dt><dd><p>Depending on whether <code class="code docutils literal notranslate"><span class="pre">groupby</span></code> is set to                 ‘cluster’ or ‘feature’, groups of features or individual                 features are assigned a gray-scale overlay creating a visual                 grouping / delimitation of features. Defaults to True.</p>
+</dd>
+<dt id="shapfire.ShapFire.plot_ranking.ax"><span class="n sig-name">ax</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)">None</a><span class="w">   </span><span class="p">|</span><span class="w">   </span><a class="reference external" href="https://matplotlib.org/stable/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.5.2)">Axes</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="kc">None</span></code><a class="headerlink" href="#shapfire.ShapFire.plot_ranking.ax" title="Permalink to this definition">¶</a></dt><dd><p>A Matplotlib Axes object. Defaults to None.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even" id="shapfire.ShapFire.plot_ranking-returns">Returns<a class="headerlink" href="#shapfire.ShapFire.plot_ranking-returns" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-even"><p>A Matplotlib Figure and Axes object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+
+
+
+  <hr>
+<div class="md-source-file">
+  <small>
+
+      Last update:
+      Jun 12, 2022
+
+  </small>
+</div>
+
+
+            </article>
+          </div>
+        </div>
+
+      </main>
+
+        <footer class="md-footer">
+
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+
+
+        <a href="api_reference.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: API Reference" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              API Reference
+            </div>
+          </div>
+        </a>
+
+
+
+        <a href="plotting.html" class="md-footer__link md-footer__link--next" aria-label="Next: shapfire.plotting" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              shapfire.plotting
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+
+    </nav>
+
+
+
+  <div class="md-footer-meta md-typeset">
+
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+    <div class="md-footer-copyright__highlight">
+        &#169; Copyright 2022, NicklasXYZ.
+
+    </div>
+
+    Created using
+    <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
+    5.0.1.
+     and
+    <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
+
+</div>
+
+    </div>
+
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["toc.integrate", "navigation.sections", "search.share"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": null, "versionPath": null}}</script>
+
+
+      <script src="../../_static/javascripts/bundle.37d1338f.min.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+
+  </body>
+</html>

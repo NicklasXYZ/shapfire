@@ -1,0 +1,1224 @@
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+
+      <link rel="icon" href="../../_static/favicon.ico">
+
+
+
+        <title>Demo: Binary Classification - ShapFire</title>
+
+
+
+      <link rel="stylesheet" href="../../_static/stylesheets/main.8674dc46.min.css">
+
+
+        <link rel="stylesheet" href="../../_static/stylesheets/palette.92c9fe4a.min.css">
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+        <link rel="stylesheet" type="text/css" href="../../_static/extra_cssv2.css" />
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan">
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#Dataset-Split" class="md-skip">
+          Skip to content
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+
+        </aside>
+      </div>
+
+
+
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../index.html" title="ShapFire" class="md-header__button md-logo" aria-label="ShapFire" data-md-component="logo">
+      <img src="../../_static/fire.svg" alt="logo">
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ShapFire
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              Demo: Binary Classification
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+      <form class="md-header__option" data-md-component="palette">
+
+
+
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+
+
+      </form>
+
+
+
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <div class="md-header__source">
+        <a href="https://github.com/nicklasxyz/shapfire/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ShapFire
+  </div>
+</a>
+      </div>
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="ShapFire" class="md-nav__button md-logo" aria-label="ShapFire" data-md-component="logo">
+      <img src="../../_static/fire.svg" alt="logo">
+    </a>
+    ShapFire
+  </label>
+
+    <div class="md-nav__source">
+      <a href="https://github.com/nicklasxyz/shapfire/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ShapFire
+  </div>
+</a>
+    </div>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        <span title="index (document)" class="md-ellipsis">About</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+
+
+
+
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="index.html"><span title="source/examples/index (document)" class="md-ellipsis">Examples</span></a>
+
+            <label for="__nav_2">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+
+        </div>
+
+      <nav class="md-nav" aria-label="Examples" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          <span title="source/examples/index (document)" class="md-ellipsis">Examples</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          <span title="source/examples/classification_demo (document)" class="md-ellipsis">Demo:<wbr> Binary Classification</span>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="" class="md-nav__link md-nav__link--active">
+        <span title="source/examples/classification_demo (document)" class="md-ellipsis">Demo:<wbr> Binary Classification</span>
+      </a>
+
+
+
+
+
+<nav class="md-nav md-nav--secondary">
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      <span title="source/examples/classification_demo (document)" class="md-ellipsis">Demo:<wbr> Binary Classification</span>
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#Dataset-Split" class="md-nav__link">
+    <span title="/source/examples/classification_demo.ipynb#dataset-split (reference label)" class="md-ellipsis">Dataset Split</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#Feature-Importance-Ranking-&-Selection" class="md-nav__link">
+    <span title="/source/examples/classification_demo.ipynb#feature-importance-ranking-&amp;-selection (reference label)" class="md-ellipsis">Feature Importance Ranking &amp; Selection</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#Feature-Importance-Plot" class="md-nav__link">
+    <span title="/source/examples/classification_demo.ipynb#feature-importance-plot (reference label)" class="md-ellipsis">Feature Importance Plot</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#Selcted-Features:-ROC-Curves" class="md-nav__link">
+    <span title="/source/examples/classification_demo.ipynb#selcted-features:-roc-curves (reference label)" class="md-ellipsis">Selcted Features:<wbr> ROC Curves</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#All-Features:-ROC-Curves" class="md-nav__link">
+    <span title="/source/examples/classification_demo.ipynb#all-features:-roc-curves (reference label)" class="md-ellipsis">All Features:<wbr> ROC Curves</span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+        </ul>
+      </nav>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../api/api_reference.html" class="md-nav__link">
+        <span title="source/api/api_reference (document)" class="md-ellipsis">API Reference</span>
+      </a>
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset" role="main">
+
+  <a href="https://github.com/nicklasxyz/shapfire/blob/main/docs/source/examples/classification_demo.ipynb" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<h1 id="Demo:-Binary-Classification">Demo: Binary Classification<a class="headerlink" href="#Demo:-Binary-Classification" title="Permalink to this heading">¶</a></h1>
+<p>Create an initial dataset for a binary classification problem with 20 features: - 6 of the features are informative - 4 of the features are linear combinations of the informative features - 10 of the features are just random noise</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Ignore lightgbm warnings</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+<span class="c1"># Import necessary libraries for the demo</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">lightgbm</span> <span class="kn">import</span> <span class="n">LGBMClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">shapfire</span> <span class="kn">import</span> <span class="n">ShapFire</span><span class="p">,</span> <span class="n">RefitHelper</span><span class="p">,</span> <span class="n">plot_roc_curve</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_classification</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">n_features</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">n_informative</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+    <span class="n">n_redundant</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">n_repeated</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;feature</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+<span class="n">X</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[1]:
+</code></pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>feature0</th>
+      <th>feature1</th>
+      <th>feature2</th>
+      <th>feature3</th>
+      <th>feature4</th>
+      <th>feature5</th>
+      <th>feature6</th>
+      <th>feature7</th>
+      <th>feature8</th>
+      <th>feature9</th>
+      <th>feature10</th>
+      <th>feature11</th>
+      <th>feature12</th>
+      <th>feature13</th>
+      <th>feature14</th>
+      <th>feature15</th>
+      <th>feature16</th>
+      <th>feature17</th>
+      <th>feature18</th>
+      <th>feature19</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-0.056717</td>
+      <td>-0.493931</td>
+      <td>1.667702</td>
+      <td>1.397865</td>
+      <td>-0.794842</td>
+      <td>-0.682968</td>
+      <td>-0.511378</td>
+      <td>-0.992701</td>
+      <td>-0.248595</td>
+      <td>-1.676577</td>
+      <td>1.206354</td>
+      <td>2.321515</td>
+      <td>-1.423698</td>
+      <td>-0.433072</td>
+      <td>0.682042</td>
+      <td>-1.125577</td>
+      <td>-0.593864</td>
+      <td>-0.024779</td>
+      <td>1.735459</td>
+      <td>-1.113934</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.012914</td>
+      <td>-0.696091</td>
+      <td>0.414157</td>
+      <td>0.567214</td>
+      <td>0.729235</td>
+      <td>2.892775</td>
+      <td>-0.016728</td>
+      <td>-1.475205</td>
+      <td>3.680440</td>
+      <td>-2.095504</td>
+      <td>-0.676781</td>
+      <td>1.576879</td>
+      <td>-2.227987</td>
+      <td>1.638134</td>
+      <td>0.015417</td>
+      <td>-0.507376</td>
+      <td>1.178729</td>
+      <td>2.676799</td>
+      <td>0.344251</td>
+      <td>0.454819</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.690440</td>
+      <td>-1.236785</td>
+      <td>-0.507020</td>
+      <td>3.027518</td>
+      <td>-2.315026</td>
+      <td>2.067620</td>
+      <td>0.273264</td>
+      <td>1.017970</td>
+      <td>1.103050</td>
+      <td>-5.071645</td>
+      <td>-1.156792</td>
+      <td>-2.066161</td>
+      <td>-1.825515</td>
+      <td>-1.288961</td>
+      <td>0.324183</td>
+      <td>0.229208</td>
+      <td>-0.033722</td>
+      <td>0.727694</td>
+      <td>0.745335</td>
+      <td>-0.315728</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2.035054</td>
+      <td>-1.154556</td>
+      <td>-0.012416</td>
+      <td>1.361509</td>
+      <td>-0.931541</td>
+      <td>2.933542</td>
+      <td>-0.734587</td>
+      <td>-0.335309</td>
+      <td>2.853751</td>
+      <td>-4.326141</td>
+      <td>-0.296359</td>
+      <td>1.215873</td>
+      <td>-0.278985</td>
+      <td>-1.448467</td>
+      <td>0.580039</td>
+      <td>0.156749</td>
+      <td>0.639724</td>
+      <td>0.029043</td>
+      <td>0.822496</td>
+      <td>1.151368</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.024961</td>
+      <td>-0.366287</td>
+      <td>2.079224</td>
+      <td>0.739798</td>
+      <td>-0.486162</td>
+      <td>0.621330</td>
+      <td>-1.945298</td>
+      <td>-1.429361</td>
+      <td>1.423769</td>
+      <td>-3.266301</td>
+      <td>2.028758</td>
+      <td>-2.972793</td>
+      <td>0.003815</td>
+      <td>-0.904622</td>
+      <td>-0.139921</td>
+      <td>-0.550930</td>
+      <td>-1.697206</td>
+      <td>0.102097</td>
+      <td>-1.056104</td>
+      <td>0.146621</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>995</th>
+      <td>1.410788</td>
+      <td>0.250078</td>
+      <td>0.366037</td>
+      <td>1.168022</td>
+      <td>-0.056665</td>
+      <td>-0.251516</td>
+      <td>-0.505207</td>
+      <td>0.175348</td>
+      <td>0.103474</td>
+      <td>-1.987223</td>
+      <td>-0.384352</td>
+      <td>-1.023449</td>
+      <td>0.664366</td>
+      <td>0.745393</td>
+      <td>0.758317</td>
+      <td>1.200208</td>
+      <td>-0.147041</td>
+      <td>0.158603</td>
+      <td>-1.219479</td>
+      <td>-1.394935</td>
+    </tr>
+    <tr>
+      <th>996</th>
+      <td>-0.613218</td>
+      <td>1.423613</td>
+      <td>1.527973</td>
+      <td>-0.245896</td>
+      <td>-2.291340</td>
+      <td>0.481899</td>
+      <td>-2.839232</td>
+      <td>1.633723</td>
+      <td>-0.621871</td>
+      <td>-3.940202</td>
+      <td>0.300710</td>
+      <td>-0.307716</td>
+      <td>-0.349721</td>
+      <td>0.175795</td>
+      <td>0.228521</td>
+      <td>0.212923</td>
+      <td>0.732526</td>
+      <td>-0.404249</td>
+      <td>-0.448734</td>
+      <td>0.305272</td>
+    </tr>
+    <tr>
+      <th>997</th>
+      <td>-0.231221</td>
+      <td>1.140357</td>
+      <td>-2.173634</td>
+      <td>-1.429259</td>
+      <td>-1.838736</td>
+      <td>-0.198766</td>
+      <td>-0.784890</td>
+      <td>3.750921</td>
+      <td>-2.509571</td>
+      <td>-0.128341</td>
+      <td>-0.031324</td>
+      <td>-0.850717</td>
+      <td>0.361888</td>
+      <td>-0.409298</td>
+      <td>0.709181</td>
+      <td>1.040780</td>
+      <td>0.269000</td>
+      <td>0.130427</td>
+      <td>-0.856227</td>
+      <td>0.278540</td>
+    </tr>
+    <tr>
+      <th>998</th>
+      <td>-3.281446</td>
+      <td>-1.185517</td>
+      <td>1.473731</td>
+      <td>0.117330</td>
+      <td>-1.795964</td>
+      <td>1.482811</td>
+      <td>0.437157</td>
+      <td>-1.201846</td>
+      <td>0.767806</td>
+      <td>-0.192885</td>
+      <td>-1.765901</td>
+      <td>-1.326832</td>
+      <td>-1.287806</td>
+      <td>-0.353538</td>
+      <td>0.996278</td>
+      <td>2.046064</td>
+      <td>-0.360873</td>
+      <td>-0.720141</td>
+      <td>0.355115</td>
+      <td>-0.995815</td>
+    </tr>
+    <tr>
+      <th>999</th>
+      <td>0.384327</td>
+      <td>0.535252</td>
+      <td>-0.050257</td>
+      <td>0.491075</td>
+      <td>0.507009</td>
+      <td>2.607129</td>
+      <td>0.183923</td>
+      <td>0.083624</td>
+      <td>2.764692</td>
+      <td>-2.048920</td>
+      <td>-0.513324</td>
+      <td>-0.085608</td>
+      <td>1.195993</td>
+      <td>-0.924152</td>
+      <td>-0.812521</td>
+      <td>-0.147024</td>
+      <td>0.184254</td>
+      <td>0.145577</td>
+      <td>0.432219</td>
+      <td>-0.270619</td>
+    </tr>
+  </tbody>
+</table>
+<p>1000 rows × 20 columns</p>
+</div></div>
+</div>
+<h2 id="Dataset-Split">Dataset Split<a class="headerlink" href="#Dataset-Split" title="Permalink to this heading">¶</a></h2>
+<p>Split the initial dataset into: - A pre-processing dataset that we use for feature ranking and selection - A final dataset which we use to obtain ROC AUC performance estimates using the selected features</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[2]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">X_preprocess</span><span class="p">,</span> <span class="n">X_final</span><span class="p">,</span> <span class="n">y_preprocess</span><span class="p">,</span> <span class="n">y_final</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<h2 id="Feature-Importance-Ranking-&amp;-Selection">Feature Importance Ranking &amp; Selection<a class="headerlink" href="#Feature-Importance-Ranking-&-Selection" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[3]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Prepare input parameters for the ShapFire method</span>
+<span class="n">estimator_class</span><span class="o">=</span><span class="n">LGBMClassifier</span>
+<span class="n">estimator_params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;objective&quot;</span><span class="p">:</span> <span class="s2">&quot;binary&quot;</span><span class="p">}</span>
+<span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;roc_auc&quot;</span>
+<span class="n">n_splits</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n_repeats</span><span class="o">=</span> <span class="mi">5</span>
+<span class="n">sf</span> <span class="o">=</span> <span class="n">ShapFire</span><span class="p">(</span>
+  <span class="n">estimator_class</span><span class="o">=</span><span class="n">estimator_class</span><span class="p">,</span>
+  <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
+  <span class="n">estimator_params</span><span class="o">=</span><span class="n">estimator_params</span><span class="p">,</span>
+  <span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span>
+  <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Perform feature importance ranking and selection</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_preprocess</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_preprocess</span><span class="p">)</span>
+
+<span class="c1"># Print the selected features</span>
+<span class="c1"># Ideally, only the 10 first features should appear in the selected features</span>
+<span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">sf</span><span class="o">.</span><span class="n">selected_features</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Selected feature: &quot;</span><span class="p">,</span> <span class="n">feature</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Clustering progress 100%|=========================| 6.00/6.00 [00:00&lt;00:00, 2.41kit/s]
+ShapFire progress   100%|=========================| 20.0/20.0 [00:01&lt;00:00, 13.0it/s]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Selected feature:  feature1
+Selected feature:  feature7
+Selected feature:  feature4
+Selected feature:  feature0
+Selected feature:  feature3
+Selected feature:  feature9
+Selected feature:  feature6
+Selected feature:  feature8
+Selected feature:  feature5
+</pre></div></div>
+</div>
+<h2 id="Feature-Importance-Plot">Feature Importance Plot<a class="headerlink" href="#Feature-Importance-Plot" title="Permalink to this heading">¶</a></h2>
+<p>To more easily get an overview of the ranked and selected features we can plot using the ShapFire class method: <code class="docutils literal notranslate"><span class="pre">plot_ranking</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[4]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Plot the selected features per cluster</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">plot_ranking</span><span class="p">()</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_examples_classification_demo_7_0.png" src="../../_images/source_examples_classification_demo_7_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[5]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="c1"># Plot the selected features per feature</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">sf</span><span class="o">.</span><span class="n">plot_ranking</span><span class="p">(</span><span class="n">groupby</span><span class="o">=</span><span class="s2">&quot;feature&quot;</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_examples_classification_demo_8_0.png" src="../../_images/source_examples_classification_demo_8_0.png" />
+</div>
+</div>
+<h2 id="Selcted-Features:-ROC-Curves">Selcted Features: ROC Curves<a class="headerlink" href="#Selcted-Features:-ROC-Curves" title="Permalink to this heading">¶</a></h2>
+<p>To get an unbiased estimate of the performance of a model that uses the previously <strong>selected features</strong> we can perform repeated <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation on the other half of the initial dataset.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[6]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">refit_helper_selected_features</span> <span class="o">=</span> <span class="n">RefitHelper</span><span class="p">(</span>
+    <span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span>
+    <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
+    <span class="n">feature_names</span><span class="o">=</span><span class="n">sf</span><span class="o">.</span><span class="n">selected_features</span><span class="p">,</span>
+    <span class="n">estimator_class</span><span class="o">=</span><span class="n">estimator_class</span><span class="p">,</span>
+    <span class="n">estimator_params</span><span class="o">=</span><span class="n">estimator_params</span><span class="p">,</span>
+    <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">refit_helper_selected_features</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_final</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_final</span><span class="p">))</span>
+
+<span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plot_roc_curve</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">refit_helper_selected_features</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_examples_classification_demo_10_0.png" src="../../_images/source_examples_classification_demo_10_0.png" />
+</div>
+</div>
+<h2 id="All-Features:-ROC-Curves">All Features: ROC Curves<a class="headerlink" href="#All-Features:-ROC-Curves" title="Permalink to this heading">¶</a></h2>
+<p>Similarly, to get an unbiased estimate of the performance of a baseline model that is trained using <strong>all initial features</strong> we perform repeated <span class="math notranslate nohighlight">\(k\)</span>-fold cross-validation on the other half of the initial dataset.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span><code>[7]:
+</code></pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><code><span class="n">refit_helper_baseline_features</span> <span class="o">=</span> <span class="n">RefitHelper</span><span class="p">(</span>
+    <span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span>
+    <span class="n">n_repeats</span><span class="o">=</span><span class="n">n_repeats</span><span class="p">,</span>
+    <span class="n">feature_names</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
+    <span class="n">estimator_class</span><span class="o">=</span><span class="n">estimator_class</span><span class="p">,</span>
+    <span class="n">estimator_params</span><span class="o">=</span><span class="n">estimator_params</span><span class="p">,</span>
+    <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">refit_helper_baseline_features</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_final</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_final</span><span class="p">))</span>
+
+<span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plot_roc_curve</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">refit_helper_baseline_features</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_examples_classification_demo_12_0.png" src="../../_images/source_examples_classification_demo_12_0.png" />
+</div>
+</div>
+
+
+
+  <hr>
+<div class="md-source-file">
+  <small>
+
+      Last update:
+      Jun 12, 2022
+
+  </small>
+</div>
+
+
+            </article>
+          </div>
+        </div>
+
+      </main>
+
+        <footer class="md-footer">
+
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+
+
+        <a href="index.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Examples" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Examples
+            </div>
+          </div>
+        </a>
+
+
+
+        <a href="../api/api_reference.html" class="md-footer__link md-footer__link--next" aria-label="Next: API Reference" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              API Reference
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+
+    </nav>
+
+
+
+  <div class="md-footer-meta md-typeset">
+
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+    <div class="md-footer-copyright__highlight">
+        &#169; Copyright 2022, NicklasXYZ.
+
+    </div>
+
+    Created using
+    <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
+    5.0.1.
+     and
+    <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
+
+</div>
+
+    </div>
+
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["toc.integrate", "navigation.sections", "search.share"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": null, "versionPath": null}}</script>
+
+
+      <script src="../../_static/javascripts/bundle.37d1338f.min.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  </body>
+</html>

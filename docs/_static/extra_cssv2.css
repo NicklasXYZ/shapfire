@@ -1,0 +1,11 @@
+/* Set the autodocs code block font size */
+.md-typeset dl.objdesc>dt, .md-typeset dl.objdesc>dt code {
+    font-size: .65rem;
+}
+
+/* Widen the inner column  */
+/* @media only screen and (min-width: 76.25em) {
+    .md-main__inner {
+      max-width: 75%;
+    }
+} */

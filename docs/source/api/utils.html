@@ -1,0 +1,639 @@
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+
+
+      <link rel="icon" href="../../_static/favicon.ico">
+
+
+
+        <title>shapfire.utils - ShapFire</title>
+
+
+
+      <link rel="stylesheet" href="../../_static/stylesheets/main.8674dc46.min.css">
+
+
+        <link rel="stylesheet" href="../../_static/stylesheets/palette.92c9fe4a.min.css">
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+        <link rel="stylesheet" type="text/css" href="../../_static/extra_cssv2.css" />
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan">
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#shapfire.utils.DEFAULT_RANDOM_SEED" class="md-skip">
+          Skip to content
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+      <div data-md-component="outdated" hidden>
+        <aside class="md-banner md-banner--warning">
+
+        </aside>
+      </div>
+
+
+
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../index.html" title="ShapFire" class="md-header__button md-logo" aria-label="ShapFire" data-md-component="logo">
+      <img src="../../_static/fire.svg" alt="logo">
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ShapFire
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              shapfire.utils
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+      <form class="md-header__option" data-md-component="palette">
+
+
+
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+
+
+      </form>
+
+
+
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <div class="md-header__source">
+        <a href="https://github.com/nicklasxyz/shapfire/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ShapFire
+  </div>
+</a>
+      </div>
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../index.html" title="ShapFire" class="md-nav__button md-logo" aria-label="ShapFire" data-md-component="logo">
+      <img src="../../_static/fire.svg" alt="logo">
+    </a>
+    ShapFire
+  </label>
+
+    <div class="md-nav__source">
+      <a href="https://github.com/nicklasxyz/shapfire/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ShapFire
+  </div>
+</a>
+    </div>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../index.html" class="md-nav__link">
+        <span title="index (document)" class="md-ellipsis">About</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../examples/index.html" class="md-nav__link">
+        <span title="source/examples/index (document)" class="md-ellipsis">Examples</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+
+
+
+
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="api_reference.html"><span title="source/api/api_reference (document)" class="md-ellipsis">API Reference</span></a>
+
+            <label for="__nav_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+
+        </div>
+
+      <nav class="md-nav" aria-label="API Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          <span title="source/api/api_reference (document)" class="md-ellipsis">API Reference</span>
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="shapfire.html" class="md-nav__link">
+        <span title="source/api/shapfire (document)" class="md-ellipsis">shapfire.<wbr>shapfire</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="plotting.html" class="md-nav__link">
+        <span title="source/api/plotting (document)" class="md-ellipsis">shapfire.<wbr>plotting</span>
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          <span title="source/api/utils (document)" class="md-ellipsis">shapfire.<wbr>utils</span>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="" class="md-nav__link md-nav__link--active">
+        <span title="source/api/utils (document)" class="md-ellipsis">shapfire.<wbr>utils</span>
+      </a>
+
+
+
+
+
+<nav class="md-nav md-nav--secondary">
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      <span title="source/api/utils (document)" class="md-ellipsis">shapfire.<wbr>utils</span>
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.utils.DEFAULT_RANDOM_SEED" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.utils.DEFAULT_RANDOM_SEED (Python data) — The default random seed used across modules." class="md-ellipsis">shapfire.<wbr>utils.<wbr>DEFAULT_<wbr>RANDOM_<wbr>SEED</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.utils.DEFAULT_REPLACE_VALUE" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.utils.DEFAULT_REPLACE_VALUE (Python data) — The default value that NaN or None values are replaced with." class="md-ellipsis">shapfire.<wbr>utils.<wbr>DEFAULT_<wbr>REPLACE_<wbr>VALUE</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.utils.DROP" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.utils.DROP (Python data) — The default string value used to indicate that samples associated with a dataset (X) and target variable (y) should be dropped if NaN or None values are contained in a sample." class="md-ellipsis">shapfire.<wbr>utils.<wbr>DROP</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.utils.DROP_FEATURES" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.utils.DROP_FEATURES (Python data) — The default string value used to indicate that a feature (column) in a dataset (X) should be dropped if it contains NaN or None values." class="md-ellipsis">shapfire.<wbr>utils.<wbr>DROP_<wbr>FEATURES</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.utils.DROP_SAMPLES" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.utils.DROP_SAMPLES (Python data) — The default string value used to indicate that a sample (row) in a dataset (X) should be dropped if it contains NaN or None values." class="md-ellipsis">shapfire.<wbr>utils.<wbr>DROP_<wbr>SAMPLES</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.utils.REPLACE" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.utils.REPLACE (Python data) — The default string value used to indicate that NaN or None values should be replaced with another given value." class="md-ellipsis">shapfire.<wbr>utils.<wbr>REPLACE</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.utils.SKIP" class="md-nav__link">
+    <span aria-label="Python data" class="objinfo-icon objinfo-icon__alias" title="Python data">V</span><span title="shapfire.utils.SKIP (Python data) — The default string value used to indicate that a value should be skipped whenever a NaN or None value is encountered." class="md-ellipsis">shapfire.<wbr>utils.<wbr>SKIP</span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shapfire.utils.associations" class="md-nav__link">
+    <span aria-label="Python function" class="objinfo-icon objinfo-icon__procedure" title="Python function">F</span><span title="shapfire.utils.associations (Python function) — Calculate pairwise measures of association/correlation between numerical and categorical features in a given dataset. Numerical-numerical association is measured through Spearman&#39;s correlation coefficient, numerical-categorical association is measured through the correlation ratio and categorical- categorical association is measured through Cramer&#39;s V." class="md-ellipsis">shapfire.<wbr>utils.<wbr>associations</span>
+  </a>
+
+    <nav class="md-nav" aria-label="shapfire.utils.associations">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.utils.associations-parameters" class="md-nav__link">
+    <span class="md-ellipsis">Parameters</span>
+  </a>
+
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#shapfire.utils.associations.X" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.utils.associations.X (Python parameter) — The input dataset that is assumed to contain features (columns) and             corresponding observations (rows)." class="md-ellipsis">X</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.utils.associations.nan_strategy" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.utils.associations.nan_strategy (Python parameter) — The action to take in case the input dataset contains             NaN or None values. Defaults to DROP_SAMPLES." class="md-ellipsis">nan_<wbr>strategy</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.utils.associations.nan_replace_value" class="md-nav__link">
+    <span aria-label="Python parameter" class="objinfo-icon objinfo-icon__sub-data" title="Python parameter">p</span><span title="shapfire.utils.associations.nan_replace_value (Python parameter) — In case the nan_strategy is             shapfire.utils.REPLACE, then this argument             determines the value which NaN or None values are replaced by.             Defaults to shapfire.utils.DEFAULT_REPLACE_VALUE." class="md-ellipsis">nan_<wbr>replace_<wbr>value</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.utils.associations-raises" class="md-nav__link">
+    <span class="md-ellipsis">Raises</span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#shapfire.utils.associations-returns" class="md-nav__link">
+    <span class="md-ellipsis">Returns</span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+        </ul>
+      </nav>
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset" role="main">
+
+  <a href="https://github.com/nicklasxyz/shapfire/blob/main/docs/source/api/utils.rst" title="Edit this page" class="md-content__button md-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+
+  <h1 id="module-shapfire.utils"><span id="shapfire-utils"></span><code class="docutils literal notranslate"><span class="pre">shapfire.utils</span></code><a class="headerlink" href="#module-shapfire.utils" title="Permalink to this heading">¶</a></h1>
+<p>This module contains a collection of general constants and functions that are
+used by several other functions and classes in the ShapFire library.</p>
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.utils.DEFAULT_RANDOM_SEED">
+<span class="sig-prename descclassname"><span class="pre">shapfire.utils.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_RANDOM_SEED</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="mi">123</span></code><a class="headerlink" href="#shapfire.utils.DEFAULT_RANDOM_SEED" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default random seed used across modules.</p>
+</dd></dl>
+
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.utils.DEFAULT_REPLACE_VALUE">
+<span class="sig-prename descclassname"><span class="pre">shapfire.utils.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_REPLACE_VALUE</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="mf">0.0</span></code><a class="headerlink" href="#shapfire.utils.DEFAULT_REPLACE_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default value that NaN or None values are replaced with.</p>
+</dd></dl>
+
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.utils.DROP">
+<span class="sig-prename descclassname"><span class="pre">shapfire.utils.</span></span><span class="sig-name descname"><span class="pre">DROP</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="s1">&#39;drop&#39;</span></code><a class="headerlink" href="#shapfire.utils.DROP" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default string value used to indicate that samples associated with a dataset (X) and target variable (y) should be dropped if NaN or None values are contained in a sample.</p>
+</dd></dl>
+
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.utils.DROP_FEATURES">
+<span class="sig-prename descclassname"><span class="pre">shapfire.utils.</span></span><span class="sig-name descname"><span class="pre">DROP_FEATURES</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="s1">&#39;drop_features&#39;</span></code><a class="headerlink" href="#shapfire.utils.DROP_FEATURES" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default string value used to indicate that a feature (column) in a dataset (X) should be dropped if it contains NaN or None values.</p>
+</dd></dl>
+
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.utils.DROP_SAMPLES">
+<span class="sig-prename descclassname"><span class="pre">shapfire.utils.</span></span><span class="sig-name descname"><span class="pre">DROP_SAMPLES</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="s1">&#39;drop_samples&#39;</span></code><a class="headerlink" href="#shapfire.utils.DROP_SAMPLES" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default string value used to indicate that a sample (row) in a dataset (X) should be dropped if it contains NaN or None values.</p>
+</dd></dl>
+
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.utils.REPLACE">
+<span class="sig-prename descclassname"><span class="pre">shapfire.utils.</span></span><span class="sig-name descname"><span class="pre">REPLACE</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="s1">&#39;replace&#39;</span></code><a class="headerlink" href="#shapfire.utils.REPLACE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default string value used to indicate that NaN or None values should be replaced with another given value.</p>
+</dd></dl>
+
+<dl class="py data objdesc">
+<dt class="sig sig-object highlight py" id="shapfire.utils.SKIP">
+<span class="sig-prename descclassname"><span class="pre">shapfire.utils.</span></span><span class="sig-name descname"><span class="pre">SKIP</span></span><span class="p"> <span class="pre">:</span> </span><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="p"> <span class="pre">=</span> </span><code class="code python docutils literal highlight highlight-python"><span class="s1">&#39;skip&#39;</span></code><a class="headerlink" href="#shapfire.utils.SKIP" title="Permalink to this definition">¶</a></dt>
+<dd><p>The default string value used to indicate that a value should be skipped whenever a NaN or None value is encountered.</p>
+</dd></dl>
+
+<dl class="py function objdesc">
+<dt class="sig sig-object highlight sig-wrap py" id="shapfire.utils.associations">
+<span class="sig-prename descclassname"><span class="pre">shapfire.utils.</span></span><span class="sig-name descname"><span class="pre">associations</span></span><span class="sig-paren">(</span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.utils.associations.X" title="shapfire.utils.associations.X (Python parameter) — The input dataset that is assumed to contain features (columns) and             corresponding observations (rows)."><span class="n"><span class="pre">X</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.utils.associations.nan_strategy" title="shapfire.utils.associations.nan_strategy (Python parameter) — The action to take in case the input dataset contains             NaN or None values. Defaults to DROP_SAMPLES."><span class="n"><span class="pre">nan_strategy</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">DROP_SAMPLES</span></code></em>, </span><span class="sig-param-decl"><em class="sig-param"><a class="n reference internal" href="#shapfire.utils.associations.nan_replace_value" title="shapfire.utils.associations.nan_replace_value (Python parameter) — In case the nan_strategy is             shapfire.utils.REPLACE, then this argument             determines the value which NaN or None values are replaced by.             Defaults to shapfire.utils.DEFAULT_REPLACE_VALUE."><span class="n"><span class="pre">nan_replace_value</span></span></a><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">DEFAULT_REPLACE_VALUE</span></code></em></span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="desctype"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)"><span class="pre">DataFrame</span></a></span></span></span><a class="reference internal" href="../../_modules/shapfire/utils.html#associations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shapfire.utils.associations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate pairwise measures of association/correlation between numerical and
+categorical features in a given dataset. Numerical-numerical association is
+measured through Spearman’s correlation coefficient, numerical-categorical
+association is measured through the correlation ratio and categorical-
+categorical association is measured through Cramer’s V.</p>
+<dl class="field-list simple">
+<dt class="field-odd" id="shapfire.utils.associations-parameters">Parameters<a class="headerlink" href="#shapfire.utils.associations-parameters" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple api-field highlight">
+<dt id="shapfire.utils.associations.X"><span class="n sig-name">X</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/dev/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.0.dev0+938.gd489393e54)">DataFrame</a></span></span><a class="headerlink" href="#shapfire.utils.associations.X" title="Permalink to this definition">¶</a></dt><dd><p>The input dataset that is assumed to contain features (columns) and             corresponding observations (rows).</p>
+</dd>
+<dt id="shapfire.utils.associations.nan_strategy"><span class="n sig-name">nan_strategy</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">DROP_SAMPLES</span></code><a class="headerlink" href="#shapfire.utils.associations.nan_strategy" title="Permalink to this definition">¶</a></dt><dd><p>The action to take in case the input dataset contains             NaN or None values. Defaults to DROP_SAMPLES.</p>
+</dd>
+<dt id="shapfire.utils.associations.nan_replace_value"><span class="n sig-name">nan_replace_value</span><span class="p">:</span><span class="w">   </span><span class="n"><span class="desctype"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)">float</a></span></span><span class="w">   </span><span class="o">=</span><span class="w">   </span><code class="code python default_value docutils literal highlight highlight-python"><span class="n">DEFAULT_REPLACE_VALUE</span></code><a class="headerlink" href="#shapfire.utils.associations.nan_replace_value" title="Permalink to this definition">¶</a></dt><dd><p>In case the <code class="code docutils literal notranslate"><span class="pre">nan_strategy</span></code> is             <a class="reference internal" href="#shapfire.utils.REPLACE" title="shapfire.utils.REPLACE (Python data) — The default string value used to indicate that NaN or None values should be replaced with another given value."><code class="xref py py-const docutils literal notranslate"><span class="pre">shapfire.utils.REPLACE</span></code></a>, then this argument             determines the value which NaN or None values are replaced by.             Defaults to <a class="reference internal" href="#shapfire.utils.DEFAULT_REPLACE_VALUE" title="shapfire.utils.DEFAULT_REPLACE_VALUE (Python data) — The default value that NaN or None values are replaced with."><code class="xref py py-const docutils literal notranslate"><span class="pre">shapfire.utils.DEFAULT_REPLACE_VALUE</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even" id="shapfire.utils.associations-raises">Raises<a class="headerlink" href="#shapfire.utils.associations-raises" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.10)"><strong>ValueError</strong></a> – If the number of <cite>category</cite> and <cite>float</cite> features (columns)             in the pandas dataframe do not add up to the total number of             features (columns) contained in the dataframe.</p>
+</dd>
+<dt class="field-odd" id="shapfire.utils.associations-returns">Returns<a class="headerlink" href="#shapfire.utils.associations-returns" title="Permalink to this headline">¶</a><span class="colon">:</span></dt>
+<dd class="field-odd"><p>A symmetric pandas dataframe that contains all pariwise feature         correlation/association values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+
+
+
+  <hr>
+<div class="md-source-file">
+  <small>
+
+      Last update:
+      Jun 12, 2022
+
+  </small>
+</div>
+
+
+            </article>
+          </div>
+        </div>
+
+      </main>
+
+        <footer class="md-footer">
+
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+
+
+        <a href="plotting.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: shapfire.plotting" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              shapfire.plotting
+            </div>
+          </div>
+        </a>
+
+
+    </nav>
+
+
+
+  <div class="md-footer-meta md-typeset">
+
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+    <div class="md-footer-copyright__highlight">
+        &#169; Copyright 2022, NicklasXYZ.
+
+    </div>
+
+    Created using
+    <a href="https://www.sphinx-doc.org/" target="_blank" rel="noopener">Sphinx</a>
+    5.0.1.
+     and
+    <a href="https://github.com/jbms/sphinx-immaterial/" target="_blank" rel="noopener">Sphinx-Immaterial</a>
+
+</div>
+
+    </div>
+
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["toc.integrate", "navigation.sections", "search.share"], "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike", "staticVersions": null, "versionPath": null}}</script>
+
+
+      <script src="../../_static/javascripts/bundle.37d1338f.min.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+
+  </body>
+</html>
