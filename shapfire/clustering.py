@@ -170,6 +170,12 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
                 + "A default value will thus be set."
             )
             self.cluster_distance_threshold = pairwise_distances.max() / 2.0
+
+            # TEMP!
+            print(
+                "Determining clusters based on 'cluster_distance_threshold': "
+                + str(self.cluster_distance_threshold),
+            )
             logging.info(
                 "Determining clusters based on 'cluster_distance_threshold': "
                 + str(self.cluster_distance_threshold),

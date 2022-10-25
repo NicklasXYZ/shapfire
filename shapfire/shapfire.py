@@ -960,8 +960,33 @@ class ShapFire(BaseEstimator, TransformerMixin):
         # Extract and organize data associated with each tested feature subset
         data_dict = self._reorganize_feature_importance_values(df=df)
 
-        ndf = self._calculate_ranked_differences(data_dict=data_dict)
-        self._discard_unimportant_feautres(df=ndf)
+        # TODO: Adjust feature selection strategy!
+        # ndf = self._calculate_ranked_differences(data_dict=data_dict)
+        # self._discard_unimportant_feautres(df=ndf)
+        feature_ranking_df = self._pick_top_k_from_clusters(
+            df=df,
+            top_k=None,
+        )
+
+        # TODO: 
+        # Select all features from each cluster
+        selected_features = feature_ranking_df.groupby(by=["cluster"]).head(1)
+
+        # Discard features with 0 importance. A selected feature should
+        # not have 0 importance!
+        selected_features = selected_features[
+            selected_features["normalized_feature_importance"] > 0
+        ]
+
+        # Further filtering based on a cutoff value
+        cut_value = self._find_cutoff(df=selected_features)
+        print("SHAP importance cutoff value: ", cut_value)
+        selected_features = selected_features[
+            selected_features["normalized_feature_importance"] >=  cut_value
+        ]
+
+        selected_feature_names = [v[0] for v in selected_features.index.values]
+        self.selected_features = selected_feature_names
         return self
 
     def transform(
@@ -1064,6 +1089,67 @@ class ShapFire(BaseEstimator, TransformerMixin):
             # TODO: If fit is called again, then self._plotting_interface should
             #       be set to None.
         return self._plotting_interface.plot_ranking(
+            groupby=groupby,
+            rcParams=rcParams,
+            figsize=figsize,
+            fontsize=fontsize,
+            with_text=with_text,
+            with_overlay=with_overlay,
+            ax=ax,
+        )
+
+    def plot_importance(
+        self,
+        plot_type: str = "stripplot",
+        groupby: str = "cluster",
+        rcParams: typing.Union[None, dict[str, str]] = None,
+        figsize: typing.Union[None, tuple[float, float]] = None,
+        fontsize: int = 10,
+        with_text: bool = True,
+        with_overlay: bool = True,
+        ax: typing.Union[None, Axes] = None,
+    ) -> tuple[Figure, Axes]:
+        """
+        Plot the normalized SHAP feature importance scores associated with each
+        feature. The features will be ordered in the figure from best to worst
+        and possibly according to which cluster they each belong to.
+
+        Args:
+            plot_type: An argument to control how the normalized SHAP feature \
+                importance scores should be displayed. Defaults to 'stripplot'.
+            groupby: A string value indicating how the feature importance \
+                ranking should be displayed in a figure. If the option \
+                'cluster' is chosen, then the features are grouped and \
+                shown in the figure based on their assigned cluster and \
+                according to the importance rank of the best feautre in the \
+                cluster. If 'feature' is chosen, then the features are \
+                shown in the figure purely according to their global rank \
+                without any consideration to what cluster each features are a \
+                part of.
+            figsize: The width and height of the figure in inches. Defaults to \
+                None.
+            fontsize: The size of the font present in the figure. Defaults to \
+                10.
+            with_text: If input argument :code:`groupby` is set to \
+                'cluster', then :code:`with_text` determines whether \
+                features that have been grouped in the figure by the cluster \
+                they each belong to, should also be annotated with a text \
+                label. Defaults to True.
+            with_overlay: Depending on whether :code:`groupby` is set to \
+                'cluster' or 'feature', groups of features or individual \
+                features are assigned a gray-scale overlay creating a visual \
+                grouping / delimitation of features. Defaults to True.
+            ax: A Matplotlib Axes object. Defaults to None.
+
+        Returns:
+            A Matplotlib Figure and Axes object.
+        """
+        if self._plotting_interface is None:
+            self._plotting_interface = ShapFirePlottingInterface(shapfire=self)
+            # TODO: If fit is called again, then self._plotting_interface should
+            #       be set to None.
+        return self._plotting_interface.plot_importance(
+            plot_type=plot_type,
             groupby=groupby,
             rcParams=rcParams,
             figsize=figsize,
@@ -1360,6 +1446,114 @@ class ShapFire(BaseEstimator, TransformerMixin):
                 arr.append(d)
         return pandas.DataFrame(data=arr)
 
+
+
+    def _pick_top_k_from_clusters(
+        self,
+        df: pandas.DataFrame,
+        top_k: typing.Union[None, int] = None,
+    ) -> pandas.DataFrame:
+        """
+        The method picks the top k best features, ranked by their normalized
+        SHAP importance score, from each cluster of highly associated/correlated
+        features.
+
+        Args:
+            df: A dataframe containing normalized SHAP feature importance \
+                scores that can be used for ranking the importance of the \
+                different features.
+            top_k: The numer of features to pick from each cluster of \
+                features. Defaults to None.
+
+        Raises:
+            TypeError: If the 'df' input argument is not a pandas dataframe.
+            ValueError: If the 'top_k' input argument is not an integer value.
+
+        Returns:
+            A dataframe reduced to the top k features from each cluster of \
+            highly associated/correlated features, ranked by their associated \
+            normalized SHAP feature importance.
+        """
+        REQUIRED_FIELDS = [
+            "feature_name",
+            "cluster",
+            "normalized_feature_importance",
+        ]
+        # Validate input arguments before proceeding
+        if not isinstance(df, pandas.DataFrame):
+            raise TypeError(
+                "The internally passed input argument 'df' is not of type "
+                + f"'DataFrame'. 'df' is instead of type {type(df)}."
+            )
+        else:
+            # Verify that all required data is contained in input argument 'df'
+            for column_name in REQUIRED_FIELDS:
+                if column_name not in list(df.columns):
+                    raise ValueError(
+                        f"The column name {column_name} is required but is "
+                        + "not contained in the internally passed input "
+                        + "argument 'df' pandas dataframe."
+                    )
+
+        # Extract necessary data
+        # TODO: Maybe make it possible to choose between agg("median") and
+        #       agg("mean")?
+        _df = (
+            df[REQUIRED_FIELDS]
+            .groupby(by=["feature_name", "cluster"])
+            .agg("median")
+            .sort_values(
+                by=["normalized_feature_importance"],
+                ascending=False,
+            )
+            .groupby(by=["cluster"])
+        )
+        # if top_k is not None:
+        #     # Return the top k best ranked features from each cluster
+        #     return _df.head(top_k)
+        # else:
+        #     # Return all features from each cluster
+        #     return _df.head(numpy.inf)
+
+        if top_k is not None:
+            # Return the top k best ranked features from each cluster
+            return _df.head(top_k)
+        else:
+            # Return all features from each cluster
+            return _df.head(numpy.inf)
+
+    def _find_cutoff(self, df, relative_change=0.1):
+        ndf = df.groupby(
+            level=0
+        ).apply(
+            max
+        ).sort_values(
+            by="normalized_feature_importance",
+            ascending=False,
+        )
+
+        values = ndf.values.flatten()
+        features = ndf.index.values.flatten()
+        ys = []
+        for i in range(1, len(values) + 1):
+            sum1 = values[:i]
+            sum2 = values[i:]
+            norm_sum1 = numpy.sum(sum1)
+            norm_sum2 = numpy.sum(sum2)
+            # Interpretation is: how much more does remaining feature contributions 
+            # "norm_sum2" explain compared to current total contributions "norm_sum1"
+            # calculated from the i - n first features
+            proportion = ((norm_sum2 / norm_sum1) * 100)
+            ys.append(proportion)
+        final_df = pandas.DataFrame(data = ys, columns=["proportions"])
+        final_df.index = features
+        print("Final df: ")
+        print(final_df)
+        cut_feature = final_df[final_df["proportions"] >= relative_change].index[-1]
+        temp_df = df.droplevel(1)
+        cut_value = temp_df[temp_df.index == cut_feature]["normalized_feature_importance"].iloc[0]
+        return cut_value
+
     def _reorganize_feature_importance_values(
         self, df: pandas.DataFrame
     ) -> dict[str, pandas.DataFrame]:
@@ -1435,6 +1629,7 @@ class ShapFire(BaseEstimator, TransformerMixin):
         selected_features = df[
             df["ranked_difference"] <= self.threshold_finder.lower_threshold
         ]
+        print("THIS ONE IS RUN!")
         self.selected_features = selected_features.index.to_list()
 
     def _loopkup_cluster_label(self, feature_name: str) -> str:
