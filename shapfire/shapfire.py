@@ -958,7 +958,7 @@ class ShapFire(BaseEstimator, TransformerMixin):
         df = self._calculate_normalized_shap_feature_importance()
 
         # Extract and organize data associated with each tested feature subset
-        data_dict = self._reorganize_feature_importance_values(df=df)
+        # data_dict = self._reorganize_feature_importance_values(df=df)
 
         # TODO: Adjust feature selection strategy!
         # ndf = self._calculate_ranked_differences(data_dict=data_dict)
@@ -978,8 +978,11 @@ class ShapFire(BaseEstimator, TransformerMixin):
             selected_features["normalized_feature_importance"] > 0
         ]
 
+        self._temp_df = selected_features
+
         # Further filtering based on a cutoff value
         cut_value = self._find_cutoff(df=selected_features)
+        self.cut_value = cut_value
         print("SHAP importance cutoff value: ", cut_value)
         selected_features = selected_features[
             selected_features["normalized_feature_importance"] >=  cut_value
@@ -1096,6 +1099,68 @@ class ShapFire(BaseEstimator, TransformerMixin):
             with_text=with_text,
             with_overlay=with_overlay,
             ax=ax,
+        )
+
+    def plot_evaluated_feature_subsets(
+        self,
+        groupby: str = "cluster",
+        rcParams: typing.Union[None, dict[str, str]] = None,
+        figsize: typing.Union[None, tuple[float, float]] = None,
+        fontsize: int = 10,
+        marker: str = "o",
+        markersize: int = 5,
+        with_text: bool = True,
+        with_overlay: bool = True,
+        axes: typing.Union[None, list[Axes]] = None,
+    ) -> tuple[Figure, list[Axes]]:
+        """
+        Plot each of the evaluated feature subsets ordered by the cross-
+        validated performance score they obtained.
+
+        Args:
+            groupby: A string value indicating how the feature importance \
+                ranking should be displayed in a figure. If the option \
+                'cluster' is chosen, then the features are grouped and \
+                shown in the figure based on their assigned cluster and \
+                according to the importance rank of the best feautre in the \
+                cluster. If 'feature' is chosen, then the features are \
+                shown in the figure purely according to their global rank \
+                without any consideration to what cluster each features are a \
+                part of.
+            figsize: The width and height of the figure in inches. Defaults to \
+                None.
+            fontsize: The size of the font present in the figure. Defaults to \
+                10.
+            marker: Marker type. Defaults to "o".
+            markersize: The marker size. Defaults to 5.
+            with_text: If input argument :code:`groupby` is set to \
+                'cluster', then :code:`with_text` determines whether \
+                features that have been grouped in the figure by the cluster \
+                they each belong to, should also be annotated with a text \
+                label. Defaults to True.
+            with_overlay: Depending on whether :code:`groupby` is set to \
+                'cluster' or 'feature', groups of features or \
+                individual features are assigned a gray-scale overlay creating \
+                a visual grouping / delimitation of features. Defaults to True.
+            axes: A list of Matplotlib Axes objects. Defaults to None.
+
+        Returns:
+            A Matplotlib Figure object and a list of Axes objects.
+        """
+        if self._plotting_interface is None:
+            self._plotting_interface = ShapFirePlottingInterface(shapfire=self)
+            # TODO: If fit is called again, then self._plotting_interface should
+            #       be set to None.
+        return self._plotting_interface.plot_evaluated_feature_subsets(
+            groupby=groupby,
+            rcParams=rcParams,
+            figsize=figsize,
+            fontsize=fontsize,
+            marker=marker,
+            markersize=markersize,
+            with_text=with_text,
+            with_overlay=with_overlay,
+            axes=axes,
         )
 
     def plot_importance(
@@ -1426,6 +1491,10 @@ class ShapFire(BaseEstimator, TransformerMixin):
                     "feature_name": row["feature_name"],
                     # Set the normalized feature importance score calculated
                     # based on the outer loop CV test fold
+
+                    # "normalized_feature_importance": row[
+                    #     "normalized_feature_importance"
+                    # ],
                     "normalized_feature_importance": row[
                         "normalized_feature_importance"
                     ],
@@ -1522,7 +1591,7 @@ class ShapFire(BaseEstimator, TransformerMixin):
             # Return all features from each cluster
             return _df.head(numpy.inf)
 
-    def _find_cutoff(self, df, relative_change=0.1):
+    def _find_cutoff(self, df, relative_change=10):
         ndf = df.groupby(
             level=0
         ).apply(
@@ -1541,7 +1610,7 @@ class ShapFire(BaseEstimator, TransformerMixin):
             norm_sum1 = numpy.sum(sum1)
             norm_sum2 = numpy.sum(sum2)
             # Interpretation is: how much more does remaining feature contributions 
-            # "norm_sum2" explain compared to current total contributions "norm_sum1"
+            # "norm_sum2" comtribute compared to current total contributions "norm_sum1"
             # calculated from the i - n first features
             proportion = ((norm_sum2 / norm_sum1) * 100)
             ys.append(proportion)

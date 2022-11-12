@@ -752,9 +752,10 @@ class ShapFirePlottingInterface:
             "data": df,
         }
 
-        print()
-        print(df)
-        print()
+        # TODO: Remove
+        # print()
+        # print(df)
+        # print()
 
         plotting_function = PLOT_IMPORTANCE_OPTIONS[plot_type]["func"]
         args.update(PLOT_IMPORTANCE_OPTIONS[plot_type]["xargs"])
@@ -772,7 +773,6 @@ class ShapFirePlottingInterface:
             offset=None,
             trim=False,
         )
-
 
         x_max = df["normalized_feature_importance"].max().max()
         df["normalized_feature_importance"].min().min()
@@ -807,9 +807,26 @@ class ShapFirePlottingInterface:
                 + f"'feature' or 'cluster' but value '{groupby}' was given."
             )
 
+
+        # Indicate the cut-off threshold
+        ax.axvline(
+            # self.shapfire.threshold_finder.lower_threshold,
+            self.shapfire.cut_value,
+            linestyle="--",
+            lw=2.25,
+            color=MAIN_COLOR_PALETTE["tertiary"],
+        )
+
         # Add a legend to the figure indicating which feautres have been
         # selected and which have been rejected
         custom_lines = [
+            Line2D(
+                [0],
+                [0],
+                color=MAIN_COLOR_PALETTE["tertiary"],
+                lw=2.25,
+                linestyle="--",
+            ),
             Line2D(
                 [0],
                 [0],
@@ -825,7 +842,7 @@ class ShapFirePlottingInterface:
         ]
         ax.legend(
             custom_lines,
-            ["Selected", "Rejected"],
+            ["Threshold", "Selected", "Rejected"],
             loc="lower right",
             fontsize=fontsize + 1,
         )
@@ -835,19 +852,31 @@ class ShapFirePlottingInterface:
         ax.set_title(
             "ShapFire importance ranking and selected features",
             fontsize=fontsize + 1,
-            pad=20,
+            # pad=20,
         )
         ax.set_xlabel(
             "Normalized SHAP feature importance", fontsize=fontsize + 1
         )
+        
         # Only display y-axis label if it is plotted alone
-        if self._is_jointplot is False:
-            ax.set_ylabel("Feature name", fontsize=fontsize + 1)
-        else:
-            ax.set_ylabel(None)
-        ax.tick_params(axis="both", which="major", labelsize=fontsize)
-        ax.tick_params(axis="both", which="minor", labelsize=fontsize)
-        ax.set_zorder(1)
+        # if self._is_jointplot is False:
+        #     ax.set_ylabel("Feature name", fontsize=fontsize + 1)
+        # else:
+        #     ax.set_ylabel(None)
+        # ax.tick_params(axis="both", which="major", labelsize=fontsize)
+        # ax.tick_params(axis="both", which="minor", labelsize=fontsize)
+        # ax.set_zorder(1)
+
+        # Set figure size
+        print("num all features: ", len(numpy.unique(df.columns.to_list())))
+        print(df)
+
+        fig = _set_figure_size(
+            figsize=figsize,
+            fig=fig,
+            num_all_features=len(numpy.unique(df.index.to_list())),
+        )
+
         return fig, ax
 
     def plot_evaluated_feature_subsets(
@@ -899,7 +928,6 @@ class ShapFirePlottingInterface:
         # Only adjust the size of the figure here if it is not being plotted
         # with together with other types of plots in the current figure
         if self._is_jointplot is False:
-            # fig, figsize = self._set_figure_size(
             fig, figsize = _set_figure_size(
                 figsize=figsize,
                 fig=fig,
@@ -1066,7 +1094,7 @@ class ShapFirePlottingInterface:
         # Only adjust the size of the figure here if it is not being plotted
         # with together with other types of plots in the current figure
         if self._is_jointplot is False:
-            fig, figsize = self._set_figure_size(
+            fig, figsize = _set_figure_size(
                 figsize=figsize,
                 fig=fig,
                 num_all_features=len(numpy.unique(df["feature_name"])),
@@ -1299,6 +1327,7 @@ def _set_figure_size(
                 )
             else:
                 figsize = (width, height)
+            print("Setting figure size 1: ", figsize)
             fig.set_size_inches(figsize)
         else:
             raise ValueError(
@@ -1309,4 +1338,5 @@ def _set_figure_size(
             )
     else:
         fig.set_size_inches(figsize)
+        print("Setting figure size 2: ", figsize)
     return fig, figsize
