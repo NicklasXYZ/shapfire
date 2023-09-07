@@ -2,7 +2,7 @@ cff-version: 1.2.0
 abstract: >-
   ShapFire is an automated and wrapper-based approach to feature importance
   ranking and feature selection based on SHAP Feature Importance Rank Ensembling.
-title: ShapFire - An automated wrapper-based approach to feature importance ranking and feature selection
+title: ShapFire - An automated wrapper-based approach to feature importance ranking and selection
 type: software
 authors:
   - given-names: Nicklas
