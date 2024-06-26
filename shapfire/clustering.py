@@ -1,8 +1,14 @@
 """This file contains methods can be applied for the purpose of clustering
 highly associated/correlated features."""
+
+import faulthandler
+
+faulthandler.enable()
+
 import logging
 import typing
 import warnings
+
 from collections import OrderedDict
 from operator import itemgetter
 
@@ -11,7 +17,8 @@ import pandas
 import scipy.cluster.hierarchy as hac
 from scipy.spatial.distance import squareform
 from sklearn.base import BaseEstimator
-from tqdm import tqdm
+
+# from tqdm import tqdm
 
 import shapfire.utils as utils
 
@@ -29,10 +36,6 @@ CLUSTERING_CRITERIA: dict[str, typing.Any] = {
     # Name : Sort score in ascending order
     # - 'cophenetic_coefficient': Larger is better
     "cophenetic_coefficient": False,
-    # - 'silhouette_score': Larger is better
-    "silhouette_score": False,
-    # - 'davies_bouldin_score': Smaller is better
-    "davies_bouldin_score": True,
 }
 
 
@@ -43,7 +46,7 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
 
     def __init__(
         self,
-        linkage_methods: list[str],
+        linkage_methods: list[str] = LINKAGE_METHODS,
         cluster_distance_threshold: typing.Union[None, float] = None,
         refit_criteria: str = "cophenetic_coefficient",
     ) -> None:
@@ -80,14 +83,10 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
         # Publically accessible variables associated with the best clustering
         # of features. These variables wil eventually be set after a call to
         # 'fit()'
-        self.clustered_association_matrix: typing.Union[
-            None, pandas.DataFrame
-        ] = None
+        self.clustered_association_matrix: typing.Union[None, pandas.DataFrame] = None
         self.linkage_method: typing.Union[None, str] = None
         self.linkage: typing.Union[None, str] = None
         self.cophenetic_coeficient: typing.Union[None, float] = None
-        self.silhouette_score = typing.Union[None, float]
-        self.davies_bouldin_score = typing.Union[None, float]
 
     def fit(
         self,
@@ -127,49 +126,55 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
                 + f"of type {type(X)}."
             )
         if y is not None:
-            msg = (
-                "Input argument 'y' has been provided but it will "
-                + "not be used!"
-            )
+            msg = "Input argument 'y' has been provided but it will " + "not be used!"
             logging.warning(msg)
             warnings.warn(message=msg)
-        # Make sure the matrix is square
-        if X.shape[0] != X.shape[1]:
+
+        # Compute feature associations/correlations
+        feature_associations = utils.associations(X=X)
+
+        # # Make sure the matrix is square
+        if feature_associations.shape[0] != feature_associations.shape[1]:
             raise ValueError(
                 "The given input argumnet 'X' does not have the same "
                 + "number of rows and columns. 'X' needs to be symmetric."
             )
         # Make sure input is a similarity matrix consisting of values in the
         # range [-1, 1]. For example correlation is in the range [-1, 1]
-        if True in numpy.unique(X[(X >= -1) & (X <= 1)].isnull()):
+        if True in numpy.unique(
+            feature_associations[
+                (feature_associations >= -1) & (feature_associations <= 1)
+            ].isnull()
+        ):
             raise ValueError(
                 "The given input argument 'X' is not a similarity matrix "
                 + "consisting of values in therange [-1, 1]."
             )
-        # Create progress bar which will be updated continuously
-        # to track the progress of the feature clustering
-        self._progress_bar = tqdm(
-            total=len(self.linkage_methods),
-            unit_scale=True,
-            ascii=" >=",
-            bar_format="{desc:<20}{percentage:3.0f}%|{bar:25}{r_bar}",
-            desc="Clustering progress ",
-        )
 
         # Turn the association matrix X into a dissimilarity matrix
-        _X = 1 - numpy.abs(X)
+        _X = 1 - numpy.abs(feature_associations)
         # Fill the diagonal elements in the matrix with zeros
         numpy.fill_diagonal(_X.values, 0)
         # Make sure the matrix is symmetric
         pairwise_distances = squareform(X=_X, checks=False, force="tovector")
-        # If no distance threshold is given then compute one based on
-        # the distances contained in the distance matrix
+
+        # Create progress bar which will be updated continuously
+        # to track the progress of the feature clustering
+        # self._progress_bar = tqdm(
+        #     total=len(self.linkage_methods),
+        #     unit_scale=True,
+        #     ascii=" >=",
+        #     bar_format="{desc:<20}{percentage:3.0f}%|{bar:25}{r_bar}",
+        #     desc="Clustering progress ",
+        # )
+
+        # If no distance threshold is given then use 0.5 as the default.
         if self.cluster_distance_threshold is None:
             logging.info(
                 "No 'cluster_distance_threshold' was given as input."
                 + "A default value will thus be set."
             )
-            self.cluster_distance_threshold = pairwise_distances.max() / 2.0
+            self.cluster_distance_threshold = 0.5
             logging.info(
                 "Determining clusters based on 'cluster_distance_threshold': "
                 + str(self.cluster_distance_threshold),
@@ -184,17 +189,18 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
         for linkage_method in self.linkage_methods:
             clustering_info.append(
                 self._perform_feature_clustering(
-                    X=_X,
+                    # X=_X,
+                    X=X,
                     linkage_method=linkage_method,
                     pairwise_distances=pairwise_distances,
                 )
             )
-            if self._progress_bar is not None:
-                # Update the progress bar
-                self._progress_bar.update(1)
-        if self._progress_bar is not None:
-            # Close/stop the progress bar
-            self._progress_bar.close()
+        #     if self._progress_bar is not None:
+        #         # Update the progress bar
+        #         self._progress_bar.update(1)
+        # if self._progress_bar is not None:
+        #     # Close/stop the progress bar
+        #     self._progress_bar.close()
 
         # Save clustering results in sorted order according to the given
         # 'refit_criteria'
@@ -212,9 +218,7 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
             ]
             return self
         else:
-            raise ValueError(
-                "Internal error. The indexing array '._idx' is None. "
-            )
+            raise ValueError("Internal error. The indexing array '._idx' is None. ")
 
     def _check_vars(self) -> None:
         """
@@ -272,8 +276,6 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
             self._idx_to_cluster_array = row["idx_to_cluster_array"]
             self.linkage_method = row["linkage_method"]
             self.cophenetic_coefficient = row["cophenetic_coefficient"]
-            self.silhouette_score = row["silhouette_score"]
-            self.davies_bouldin_score = row["davies_bouldin_score"]
             self.linkage = row["linkage_object"]
             logging.info(
                 "\nSetting the best clustering parameter values based on "
@@ -286,9 +288,6 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
                 + "Cophenetic correlation coefficient (larger is better): "
                 + f"{self.cophenetic_coefficient}.\n"
                 + "Silhouette score coefficient       (larger is better): "
-                + f"{self.silhouette_score}.\n"
-                + "Davies Bouldin score              (smaller is better): "
-                + f"{self.davies_bouldin_score}.\n"
             )
         else:
             raise ValueError(
@@ -342,19 +341,6 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
         )
         idx = numpy.argsort(idx_to_cluster_array)
 
-        # Calculate the Silhouette score
-        sil_score = None
-        # = silhouette_score(
-        #     X=X,
-        #     labels=idx_to_cluster_array,
-        #     metric="precomputed",
-        # )
-        # Calculate the Davies Bouldin score
-        db_score = None
-        # davies_bouldin_score(
-        #     X=X,
-        #     labels=idx_to_cluster_array,
-        # )
         # Compute the cophenetic correlation coefficient
         cophenetic_coef, _ = hac.cophenet(Z=linkage, Y=pairwise_distances)
         cluster_labels = numpy.unique(idx_to_cluster_array)
@@ -363,10 +349,6 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
             + f"{len(cluster_labels)}.\n"
             + "Cophenetic correlation coefficient (larger is better): "
             + f"{cophenetic_coef}.\n"
-            + "Silhouette score coefficient       (larger is better): "
-            + f"{sil_score}.\n"
-            + "Davies Bouldin score              (smaller is better): "
-            + f"{db_score}.\n"
         )
 
         # Return data associated with the obtained clustering so we subsequently
@@ -374,80 +356,10 @@ class AutoHierarchicalAssociationClustering(BaseEstimator):
         return {
             "linkage_method": linkage_method,
             "cophenetic_coefficient": cophenetic_coef,
-            "silhouette_score": sil_score,
-            "davies_bouldin_score": db_score,
             "idx_to_cluster_array": idx_to_cluster_array,
             "idx": idx,
             "linkage_object": linkage,
         }
-
-
-# An 'AutoHierarchicalAssociationClustering' helper method
-def _identify_colinear_features(
-    # NOTE: Internal method. Assume 'df' is passed as a pandas dataframe
-    df: pandas.DataFrame,
-    linkage_methods: list[str] = LINKAGE_METHODS,
-) -> tuple[pandas.DataFrame, "AutoHierarchicalAssociationClustering"]:
-    """
-    A 'AutoHierarchicalAssociationClustering' helper method that applies \
-    hierarchical agglomerative clustering to the given input dataset \
-    consisting of features (columns) and corresponding observations (rows). \
-    The method furthermore organizes the ouput data for subsequent processing.
-
-    Raises:
-        ValueError: If the internally set indexing array \
-            '._idx_to_cluster_array' on the created \
-            'AutoHierarchicalAssociationClustering' object has not been set.
-
-    Returns:
-        Results pertaining to the obtained clustering of highly associated/\
-        correlated features.
-    """
-    # Determine the pairwise strength of association/correlation between
-    # features
-    feature_associations = utils.associations(X=df)
-
-    # Cluster collinear/multicollinear features
-    model = AutoHierarchicalAssociationClustering(
-        linkage_methods=linkage_methods
-    )
-    model.fit(feature_associations)
-
-    # Organize information in a dictionary and then a dataframe
-    dict_cluster_labels: dict[int, typing.Any] = {}
-    # Extract a list of feature names
-    feature_names = df.columns.to_list()
-    # Extract all cluster labels
-    if model._idx_to_cluster_array is not None:
-        cluster_labels = numpy.unique(model._idx_to_cluster_array)
-    else:
-        raise ValueError(
-            "Internal error."
-            + "The indexing array '._idx_to_cluster_array' is None."
-        )
-    # Make a list entry in the 'dict_cluster_labels' dictionary for each
-    # possible cluster label
-    for i in range(len(cluster_labels)):
-        dict_cluster_labels[int(cluster_labels[i])] = []
-
-    # Populate each of the lists associated with a cluster, with
-    # feature names corresponding to the features that were placed
-    # in those clusters
-    for i in range(len(model._idx_to_cluster_array)):
-        dict_cluster_labels[model._idx_to_cluster_array[i]].append(
-            feature_names[i]
-        )
-    lst: list[dict[str, typing.Any]] = []
-    for label in dict_cluster_labels:
-        for feature_name in dict_cluster_labels[label]:
-            d = {"cluster_label": label, "feature_name": feature_name}
-            lst.append(d)
-    df_cluster_labels = pandas.DataFrame(data=lst)
-    logging.info(
-        "The following cluster labels have been assigned to "
-        + f"the corresponding feature names:\n{df_cluster_labels}",
-    )
-    return df_cluster_labels, model
 
 
 class Cluster:

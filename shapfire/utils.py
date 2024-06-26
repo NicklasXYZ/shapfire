@@ -1,7 +1,6 @@
 """This module contains a collection of general constants and functions that are
 used by several other functions and classes in the ShapFire library."""
 
-
 import typing
 
 import numpy
@@ -63,43 +62,43 @@ def replace_nan_with_value(
     return x, y
 
 
-def convert(
-    data: typing.Union[numpy.ndarray, pandas.Series, pandas.DataFrame, list],
-    to: str,
-    copy: bool = True,
-) -> typing.Union[numpy.ndarray, pandas.Series, pandas.DataFrame, list]:
-    converted: typing.Union[
-        None, numpy.ndarray, pandas.Series, pandas.DataFrame, list
-    ] = None
-    if to.strip().lower() == "array":
-        if isinstance(data, numpy.ndarray):
-            converted = data.copy() if copy else data
-        elif isinstance(data, pandas.Series):
-            converted = data.values
-        elif isinstance(data, list):
-            converted = numpy.array(data)
-        elif isinstance(data, pandas.DataFrame):
-            converted = data.values()
-    elif to.strip().lower() == "list":
-        if isinstance(data, list):
-            converted = data.copy() if copy else data
-        elif isinstance(data, pandas.Series):
-            converted = data.values.tolist()
-        elif isinstance(data, numpy.ndarray):
-            converted = data.tolist()
-    elif to.strip().lower() == "dataframe":
-        if isinstance(data, pandas.DataFrame):
-            converted = data.copy(deep=True) if copy else data
-        elif isinstance(data, numpy.ndarray):
-            converted = pandas.DataFrame(data)
-    else:
-        raise ValueError(f"Unknown data conversion: {to}")
-    if converted is None:
-        raise TypeError(
-            f"Cannot handle data conversion of type: {type(data)} to {to}"
-        )
-    else:
-        return converted
+# def convert(
+#     data: typing.Union[numpy.ndarray, pandas.Series, pandas.DataFrame, list],
+#     to: str,
+#     copy: bool = True,
+# ) -> typing.Union[numpy.ndarray, pandas.Series, pandas.DataFrame, list]:
+#     converted: typing.Union[
+#         None, numpy.ndarray, pandas.Series, pandas.DataFrame, list
+#     ] = None
+#     if to.strip().lower() == "array":
+#         if isinstance(data, numpy.ndarray):
+#             converted = data.copy() if copy else data
+#         elif isinstance(data, pandas.Series):
+#             converted = data.values
+#         elif isinstance(data, list):
+#             converted = numpy.array(data)
+#         elif isinstance(data, pandas.DataFrame):
+#             converted = data.values()
+#     elif to.strip().lower() == "list":
+#         if isinstance(data, list):
+#             converted = data.copy() if copy else data
+#         elif isinstance(data, pandas.Series):
+#             converted = data.values.tolist()
+#         elif isinstance(data, numpy.ndarray):
+#             converted = data.tolist()
+#     elif to.strip().lower() == "dataframe":
+#         if isinstance(data, pandas.DataFrame):
+#             converted = data.copy(deep=True) if copy else data
+#         elif isinstance(data, numpy.ndarray):
+#             converted = pandas.DataFrame(data)
+#     else:
+#         raise ValueError(f"Unknown data conversion: {to}")
+#     if converted is None:
+#         raise TypeError(
+#             f"Cannot handle data conversion of type: {type(data)} to {to}"
+#         )
+#     else:
+#         return converted
 
 
 def cramers_v(
@@ -111,14 +110,14 @@ def cramers_v(
     nan_strategy: str = REPLACE,
     nan_replace_value: float = DEFAULT_REPLACE_VALUE,
 ) -> float:
-    if nan_strategy == REPLACE:
-        x, y = replace_nan_with_value(
-            x=x,
-            y=y,
-            value=nan_replace_value,
-        )
-    elif nan_strategy == DROP:
-        x, y = remove_incomplete_samples(x=x, y=y)
+    # if nan_strategy == REPLACE:
+    #     x, y = replace_nan_with_value(
+    #         x=x,
+    #         y=y,
+    #         value=nan_replace_value,
+    #     )
+    # elif nan_strategy == DROP:
+    #     x, y = remove_incomplete_samples(x=x, y=y)
     confusion_matrix = pandas.crosstab(index=x, columns=y)
     chi2, _, _, _ = stats.chi2_contingency(confusion_matrix)
     n = confusion_matrix.sum().sum()
@@ -153,18 +152,21 @@ def correlation_ratio(
     nan_strategy: str = REPLACE,
     nan_replace_value: float = DEFAULT_REPLACE_VALUE,
 ) -> float:
-    if nan_strategy == REPLACE:
-        categories, measurements = replace_nan_with_value(
-            x=categories,
-            y=measurements,
-            value=nan_replace_value,
-        )
-    elif nan_strategy == DROP:
-        categories, measurements = remove_incomplete_samples(
-            x=categories, y=measurements
-        )
-    categories = convert(data=categories, to="array")
-    measurements = convert(data=measurements, to="array")
+    # if nan_strategy == REPLACE:
+    #     categories, measurements = replace_nan_with_value(
+    #         x=categories,
+    #         y=measurements,
+    #         value=nan_replace_value,
+    #     )
+    # elif nan_strategy == DROP:
+    #     print("dropping values")
+    #     categories, measurements = remove_incomplete_samples(
+    #         x=categories, y=measurements
+    #     )
+    # categories = convert(data=categories, to="array")
+    # measurements = convert(data=measurements, to="array")
+    categories = categories.values
+    measurements = measurements.values
     fcat, _ = pandas.factorize(categories)
     cat_num = numpy.max(fcat) + 1
     y_avg_array = numpy.zeros(cat_num)
@@ -204,11 +206,7 @@ def correlation_ratio(
     return eta
 
 
-def associations(
-    X: pandas.DataFrame,
-    nan_strategy: str = DROP_SAMPLES,
-    nan_replace_value: float = DEFAULT_REPLACE_VALUE,
-) -> pandas.DataFrame:
+def associations(X: pandas.DataFrame, nan_strategy: str = DROP_SAMPLES, nan_replace_value: float = DEFAULT_REPLACE_VALUE) -> pandas.DataFrame:
     """
     Calculate pairwise measures of association/correlation between numerical and
     categorical features in a given dataset. Numerical-numerical association is
@@ -240,20 +238,20 @@ def associations(
     columns = X.columns
 
     # Apply a strategy for handling NaN values in the given data
-    if nan_strategy == REPLACE:
-        _X = X.fillna(value=nan_replace_value, inplace=False)
-    elif nan_strategy == DROP_SAMPLES:
-        _X = X.dropna(axis=0, inplace=False)
-    elif nan_strategy == DROP_FEATURES:
-        _X = X.dropna(axis=1, inplace=False)
-    else:
-        _X = X.copy()
+    # if nan_strategy == REPLACE:
+    #     _X = X.fillna(value=nan_replace_value, inplace=False)
+    # elif nan_strategy == DROP_SAMPLES:
+    #     _X = X.dropna(axis=0, inplace=False)
+    # elif nan_strategy == DROP_FEATURES:
+    #     _X = X.dropna(axis=1, inplace=False)
+    # else:
+    #     _X = X
 
     # Identify categorical features and columns
-    cat_columns = _X.select_dtypes(include=["category"]).columns
+    cat_columns = X.select_dtypes(include=["category"]).columns
     # Identify numerical features and columns
-    num_columns = _X.select_dtypes(include=["float"]).columns
-    if len(cat_columns) + len(num_columns) != _X.shape[1]:
+    num_columns = X.select_dtypes(include=["float"]).columns
+    if len(cat_columns) + len(num_columns) != X.shape[1]:
         # Make sure that columns are either of type 'category' or type 'float'
         raise ValueError(
             "The number of categorical and numerical features (columns) in "
@@ -266,10 +264,10 @@ def associations(
     # Create dataframe for storing associations values
     c = pandas.DataFrame(index=columns, columns=columns)
 
-    # Find single-value columns
+    # # Find single-value columns
     single_value_columns_set = set()
     for column in columns:
-        if _X[column].unique().size == 1:
+        if X[column].unique().size == 1:
             single_value_columns_set.add(column)
 
     # Compute feature associations
@@ -286,31 +284,31 @@ def associations(
                 if columns[i] in cat_columns:
                     if columns[j] in cat_columns:
                         cell = cramers_v(
-                            _X[columns[i]],
-                            _X[columns[j]],
+                            X[columns[i]],
+                            X[columns[j]],
                             bias_correction=False,
                             nan_strategy=SKIP,
                         )
                         ij, ji = cell, cell
                     else:
                         cell = correlation_ratio(
-                            _X[columns[i]],
-                            _X[columns[j]],
+                            X[columns[i]],
+                            X[columns[j]],
                             nan_strategy=SKIP,
                         )
                         ij, ji = cell, cell
                 else:
                     if columns[j] in cat_columns:
                         cell = correlation_ratio(
-                            _X[columns[j]],
-                            _X[columns[i]],
+                            X[columns[j]],
+                            X[columns[i]],
                             nan_strategy=SKIP,
                         )
                         ij, ji = cell, cell
                     else:
                         cell, _ = stats.spearmanr(
-                            _X[columns[i]],
-                            _X[columns[j]],
+                            X[columns[i]],
+                            X[columns[j]],
                         )
                         ij, ji = cell, cell
                 c.loc[columns[i], columns[j]] = (
@@ -321,66 +319,3 @@ def associations(
                 )
     c.fillna(value=numpy.nan, inplace=True)
     return c
-
-
-class ThresholdFinder:
-    def __init__(
-        self,
-        random_seed: int,
-        ncols: int,
-        n_batches: int = 250,
-        n_samples: int = 1000,
-    ) -> None:
-        self.ncols = ncols
-        self.n_batches = n_batches
-        self.n_samples = n_samples
-        self.random_seed = random_seed
-        self.data: typing.Union[None, list[float]] = None
-
-        self.lower_threshold: typing.Union[None, float] = None
-        self.iqr: typing.Union[None, float] = None
-        self.upper_threshold: typing.Union[None, float] = None
-
-    def fit(self) -> dict[str, float]:
-        self.data = self.estimate_ranking_distribution()
-        a, b, c = self.find_quartiles(data=self.data)
-
-        self.lower_threshold = a
-        self.iqr = b
-        self.upper_threshold = c
-        return {
-            "lower_threshold": a,
-            "iqr": b,
-            "upper_threshold": c,
-        }
-
-    def find_quartiles(
-        self, data: list[float]
-    ) -> typing.Tuple[float, float, float]:
-        data = sorted(data)
-        q1, q3 = numpy.percentile(data, [25, 75])
-        iqr = q3 - q1
-        lower_bound = q1 - (1.5 * iqr)
-        upper_bound = q3 + (1.5 * iqr)
-        return lower_bound, iqr, upper_bound
-
-    def estimate_ranking_distribution(self) -> list[float]:
-        rng = numpy.random.default_rng(self.random_seed)
-        # Generate ideal ranking with ranking starting from 1
-        ideal_rank = numpy.arange(self.ncols) + 1
-        vstacked_list: list[float] = []
-        for _ in range(self.n_batches):
-            rnd_order = rng.permuted(
-                numpy.tile(ideal_rank, self.n_samples).reshape(
-                    self.n_samples, ideal_rank.size
-                ),
-                axis=1,
-            )
-            # Compute mean over rows
-            result = numpy.mean(numpy.abs(ideal_rank - rnd_order), axis=0)
-            vstacked_list.extend(result)
-        return vstacked_list
-
-    def plot_ranking_distribution(self) -> None:
-        # TODO
-        return None
