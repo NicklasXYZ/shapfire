@@ -204,11 +204,7 @@ def correlation_ratio(
     return eta
 
 
-def associations(
-    X: pandas.DataFrame,
-    nan_strategy: str = DROP_SAMPLES,
-    nan_replace_value: float = DEFAULT_REPLACE_VALUE,
-) -> pandas.DataFrame:
+def associations(X: pandas.DataFrame, nan_strategy: str = DROP_SAMPLES, nan_replace_value: float = DEFAULT_REPLACE_VALUE) -> pandas.DataFrame:
     """
     Calculate pairwise measures of association/correlation between numerical and
     categorical features in a given dataset. Numerical-numerical association is
@@ -240,14 +236,24 @@ def associations(
     columns = X.columns
 
     # Apply a strategy for handling NaN values in the given data
-    if nan_strategy == REPLACE:
-        _X = X.fillna(value=nan_replace_value, inplace=False)
-    elif nan_strategy == DROP_SAMPLES:
-        _X = X.dropna(axis=0, inplace=False)
-    elif nan_strategy == DROP_FEATURES:
-        _X = X.dropna(axis=1, inplace=False)
-    else:
-        _X = X.copy()
+    # if nan_strategy == REPLACE:
+    #     _X = X.fillna(value=nan_replace_value, inplace=False)
+    # elif nan_strategy == DROP_SAMPLES:
+    #     _X = X.dropna(axis=0, inplace=False)
+    # elif nan_strategy == DROP_FEATURES:
+    #     _X = X.dropna(axis=1, inplace=False)
+    # else:
+    #     _X = X.copy()
+
+    # if nan_strategy == REPLACE:
+    #     _X = X.fillna(value=nan_replace_value, inplace=False)
+    # elif nan_strategy == DROP_SAMPLES:
+    #     _X = X.dropna(axis=0, inplace=False)
+    # elif nan_strategy == DROP_FEATURES:
+    #     _X = X.dropna(axis=1, inplace=False)
+    # else:
+    _X = X#.copy()
+
 
     # Identify categorical features and columns
     cat_columns = _X.select_dtypes(include=["category"]).columns

@@ -1,53 +1,62 @@
-
-![](documentation/logo/shapfirelogov2.png)
-
-
 # About
 
-[![License](https://img.shields.io/badge/Code%20style-Black-white)](https://img.shields.io/badge/Code%20style-Black-white)
-[![Code Style](https://img.shields.io/badge/License-MIT-white.svg)](https://shapfire.readthedocs.io/en/latest/?badge=latest)
-
-
-ShapFire is an automated and *wrapper-based* approach to *feature importance
-ranking* and *feature selection* based on *SHAP* Feature Importance Rank
-Ensembling (SHAPFire, stylized ShapFire).
+ShapFire is an automated, wrapper-based approach for feature importance ranking and feature selection based on SHAP Feature Importance Rank Ensembling (SHAPFire, stylized ShapFire).
 
 ShapFire is built on top of Microsofts gradient boosting decision tree framework
 [LightGBM](https://github.com/microsoft/LightGBM/) and the
 [SHAP](https://github.com/slundberg/shap/) (SHapley Additive exPlanations)
 Python library for Machine Learning (ML) model inspection and interpretation.
 
-The ShapFire approach is motivated by the fact that highly associated features
-in an input dataset can affect ML model interpretability, making
-it hard to obtain accurate feature importance rankings.
+## Reference
 
-ShapFire aims to work specifically in a setting where the input dataset
-contains several highly associated features that need to be assigned a globally
-consistent ranking that, e.g., a domain expert can further assess.
+This branch contains the version of ShapFire applied in the following paper:
 
+> Skovbo, J. S., Andersen, N. S., Obel, L. M., Laursen, M. S., Riis, A. S., Houlind, K. C., Pyndt Diederichsen, A. C., & Lindholt, J. S. (2025). Individual risk assessment for rupture of abdominal aortic aneurysm using artificial intelligence. Journal of Vascular Surgery, 81(3), 613–622.e5.
+> https://doi.org/10.1016/j.jvs.2024.11.017
 
-# Getting Started
+## Setup 
 
-Install the development version from the git source:
+### Create a virtual environment
 
-```bash
-pip install git+https://github.com/nicklasxyz/shapfire.git
-```
-
-Then see: [Binary Classification Demo](https://nicklasxyz.github.io/shapfire/source/examples/classification_demo.html)
-
-# Development
+ShapFire requires Python 3.11:
 
 ```bash
-# First, fork or clone the repo, then:
-conda create -n shapfire python=3.9 && \
-pip install poetry && \
-poetry install
-
-# Install pandoc to be able to work with python notebooks
-# in the documentation
-conda install -c conda-forge pandoc
-
-# Generate docs
-sphinx-build documentation docs && touch docs/.nojekyll
+python3.11 -m venv venv
+source venv/bin/activate
 ```
+
+### Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Running the Analysis Notebook
+
+The analysis code used for the paper is provided in the Jupyter notebook `AAA-analysis.ipynb`, and can be run by additionally installing Jupyter and opening the notebook:
+
+```bash
+pip install jupyter
+jupyter notebook
+```
+
+Once the notebook is open, then run all cells.
+
+## Applying Pre-trained models
+
+Three pre-trained models are available in the repository. Each includes model-specific data, metadata, and a schema for handling input/output:
+
+- `export_all_features_prod/`: Production model trained using all available features
+- `export_selected_features_prod/`: Production model trained using ShapFire-selected features
+- `export_single_feature_prod/`: Production model trained on a single feature (maximal anterior–posterior diameter)
+
+Predictions can be generated using the provided `predict.py` script (referencing a model-specific directory):
+
+```bash
+python predict.py \
+    --export-dir export_selected_features_prod \
+    --input dataset.csv \
+    --output predictions.csv
+```
+
+Note that input datasets (`dataset.csv`) must match the feature names and structure defined in the corresponding `schema.json` contained in the specified `export-dir` (in this case the `export_selected_features_prod`). Furthermore, the script will save predictions to the specified output file (`predictions.csv`) in CSV format.

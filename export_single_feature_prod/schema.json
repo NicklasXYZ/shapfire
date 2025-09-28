@@ -1,0 +1,14 @@
+{
+  "feature_names": [
+    "Maximal anterior-posterior diameter (cm)"
+  ],
+  "dtypes": {
+    "Maximal anterior-posterior diameter (cm)": "float64"
+  },
+  "categorical_feature": [],
+  "missing_value_policy": "pass-through (NaN)",
+  "label_policy": {
+    "type": "threshold",
+    "threshold": 0.5
+  }
+}

@@ -1,23 +1,20 @@
-"""This module contains the main implementation of the ShapFire method for
-feature ranking and selection."""
-
+import shap
+import numpy as np
+import pandas as pd
+import scipy.cluster.hierarchy as hac
+from scipy.spatial.distance import squareform
+import scipy.stats as stats
+from collections import OrderedDict
+from operator import itemgetter
+from collections import defaultdict
 import logging
 import typing
 
-import lightgbm
-import numpy
-import pandas
-import shap
-import sklearn
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
 from sklearn.base import (
-    BaseEstimator,
-    TransformerMixin,
     is_classifier,
     is_regressor,
 )
-from sklearn.metrics import auc, roc_curve
+from sklearn.metrics import auc, roc_curve, confusion_matrix
 from sklearn.model_selection import (
     GridSearchCV,
     RandomizedSearchCV,
@@ -25,245 +22,76 @@ from sklearn.model_selection import (
     RepeatedStratifiedKFold,
     cross_val_score,
 )
-from tqdm import tqdm
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from sklearn.metrics import auc
+import seaborn as sns
 
 import shapfire.utils as utils
-from shapfire.clustering import (
-    AutoHierarchicalAssociationClustering,
-    ClusterSampler,
-    _identify_colinear_features,
-)
-from shapfire.plotting import ShapFirePlottingInterface
-
-DEFAULT_SPLITS: int = 2
-"""The default number of folds a dataset should be divided into in a
-cross-validation."""
-
-DEFAULT_REPEATS: int = 1
-"""The number of times, in a cross-validation, the division of a dataset into a
-certain number of folds should be repeated.
-"""
 
 # Valid hyperparameter search methods
-HYPERPARAMETER_SEARCH_METHODS: list[typing.Any] = [
+HYPERPARAMETER_SEARCH_METHODS = [
     RandomizedSearchCV,
     GridSearchCV,
     None,
 ]
 
-# Valid estimator classes
-ESTIMATOR_CLASSES: list = [
-    lightgbm.LGBMClassifier,
-    lightgbm.LGBMRegressor,
-    sklearn.ensemble.RandomForestClassifier,
-    sklearn.ensemble.RandomForestRegressor,
+DEFAULT_RANDOM_SEED = 123
+LINKAGE_METHODS = [
+    "average",
+    "centroid",
+    "complete",
+    "median",
+    "single",
+    "ward",
 ]
 
-# NOTE: All scorer objects follow the convention that higher return values are
-# better than lower return values.
-CLASSIFICATION_SCORING: dict[str, typing.Any] = {
-    # "accuracy",
-    # "balanced_accuracy",
-    # "top_k_accuracy",
-    # "average_precision",
-    # "neg_brier_score",
-    # "f1",
-    # "f1_micro",
-    # "f1_macro",
-    # "f1_weighted",
-    # "f1_samples",
-    # "neg_log_loss",
-    # "precision",
-    # "precision_micro",
-    # "precision_macro",
-    # "precision_weighted",
-    # "precision_samples",
-    # "recall",
-    # "recall_micro",
-    # "recall_macro",
-    # "recall_weighted",
-    # "recall_samples",
-    # "jaccard",
-    # "jaccard_micro",
-    # "jaccard_macro",
-    # "jaccard_weighted",
-    # "jaccard_samples",
-    "roc_auc": {
-        # Indicate that the score is by default positive
-        "sign": 1,
-        "best": 1.0,
-        "worst": 0.0,
-    },
-    # "roc_auc_ovr",
-    # "roc_auc_ovo",
-    # "roc_auc_ovr_weighted",
-    # "roc_auc_ovo_weighted",
-}
+DEFAULT_SPLITS = 2
+"""The default number of folds a dataset should be divided into in a
+cross-validation."""
 
-# NOTE: All scorer objects follow the convention that higher return values are
-# better than lower return values.
-REGRESSION_SCORING: dict[str, typing.Any] = {
-    "explained_variance": {
-        # Indicate that the score is by default positive
-        "sign": 1,
-        "best": 1.0,
-        "worst": -numpy.inf,
-    },
-    "max_error": {
-        # Indicate that the score is by default negative
-        "sign": -1,
-        "best": 0.0,
-        "worst": -numpy.inf,
-    },
-    "neg_mean_absolute_error": {
-        # Indicate that the score is by default negative
-        "sign": -1,
-        "best": 0.0,
-        "worst": -numpy.inf,
-    },
-    "neg_mean_squared_error": {
-        # Indicate that the score is by default negative
-        "sign": -1,
-        "best": 0.0,
-        "worst": -numpy.inf,
-    }
-    # "neg_root_mean_squared_error",
-    # "neg_mean_squared_log_error",
-    # "neg_median_absolute_error",
-    # "r2",
-    # "neg_mean_poisson_deviance",
-    # "neg_mean_gamma_deviance",
-    # "neg_mean_absolute_percentage_error",
-}
+DEFAULT_REPEATS = 1
+"""The number of times, in a cross-validation, the division of a dataset into a
+certain number of folds should be repeated.
+"""
 
+REPLACE = "replace"
+"""The default string value used to indicate that NaN or None values should be \
+replaced with another given value."""  # pylint: disable=W0105
 
-def _check_estimator_class(
-    estimator_class: typing.Union[
-        lightgbm.LGBMClassifier,
-        lightgbm.LGBMRegressor,
-        sklearn.ensemble.RandomForestClassifier,
-        sklearn.ensemble.RandomForestRegressor,
-    ],
-) -> None:
-    if estimator_class not in ESTIMATOR_CLASSES:
-        raise ValueError(
-            f"The given estimator class {estimator_class} is not a "
-            + "valid estimator."
-        )
+DROP = "drop"
+"""The default string value used to indicate that samples associated with a \
+dataset (X) and target variable (y) should be dropped if NaN or None values \
+are contained in a sample.
+"""  # pylint: disable=W0105
 
+DROP_SAMPLES = "drop_samples"
+"""The default string value used to indicate that a sample (row) in a dataset \
+(X) should be dropped if it contains NaN or None values.
+"""  # pylint: disable=W0105
 
-def _check_scoring_function(
-    scoring: typing.Union[str, typing.Callable],
-    estimator_class: typing.Union[
-        lightgbm.LGBMClassifier,
-        lightgbm.LGBMRegressor,
-        sklearn.ensemble.RandomForestClassifier,
-        sklearn.ensemble.RandomForestRegressor,
-    ],
-) -> None:
-    # if 'self.scoring' is a string then make sure the specified
-    # scoring function is lower-case and does not contain any whitespace
-    # before checking whether it is actually a valid scoring function
-    if isinstance(scoring, str):
-        scoring = scoring.strip().lower()
-        if is_classifier(estimator_class):
-            if scoring not in list(CLASSIFICATION_SCORING.keys()):
-                raise ValueError(
-                    f"The given scoring function {scoring} is not a "
-                    + "valid scorer for a classifiction task using "
-                    + f"estimator {estimator_class}."
-                )
-        elif is_regressor(estimator_class):
-            if scoring not in list(REGRESSION_SCORING.keys()):
-                raise ValueError(
-                    f"The given scoring function {scoring} is not a "
-                    + "valid scorer for a regression task using estimator "
-                    + f"{estimator_class}."
-                )
-        else:
-            raise ValueError(
-                "It could not be determined whether the given "
-                + f"'ShapFire.estimator_class': {estimator_class} "
-                + "is a classifier or a regressor."
-            )
-    elif isinstance(scoring, typing.Callable):  # type: ignore
-        # TODO: Check that 'self.scoring' is a valid scoring function
-        raise NotImplementedError(
-            "It is currently not possible to pass a callable scoring "
-            + "function"
-        )
+DROP_FEATURES = "drop_features"
+"""The default string value used to indicate that a feature (column) in a \
+dataset (X) should be dropped if it contains NaN or None values.
+"""  # pylint: disable=W0105
 
+SKIP = "skip"
+"""The default string value used to indicate that a value should be skipped \
+whenever a NaN or None value is encountered.
+"""  # pylint: disable=W0105
 
-def _check_hyperparameter_search_params(
-    hyperparameter_search: typing.Union[None, GridSearchCV, RandomizedSearchCV],
-) -> None:
-    if hyperparameter_search is not None:
-        if (
-            hyperparameter_search != GridSearchCV
-            and hyperparameter_search != RandomizedSearchCV
-        ):
-            raise ValueError(
-                "The given input argument 'hyperparameter_search': "
-                + f"'{hyperparameter_search}' is not a valid "
-                + "option. Valid input values are: "
-                + ", ".join(HYPERPARAMETER_SEARCH_METHODS)
-                + "."
-            )
-
-
-def _check_cv_params(n_splits: int, n_repeats: int) -> None:
-    if n_splits < 2:
-        raise ValueError(
-            "The given input argument 'n_splits' can not be less " + "than 2."
-        )
-    if n_repeats < 1:
-        raise ValueError(
-            "The given input argument 'n_repeats' can not be" "less than 1."
-        )
-
-
-def _check_reference_vector_params(reference: str) -> None:
-    if reference not in ["min", "max", "mean", "median"]:
-        raise ValueError(
-            f"The given input argument 'reference': {reference} "
-            + " is not a  valid option. Valid options are: "
-            + ", ".join(["min", "max", "median", "mean"])
-            + "."
-        )
+DEFAULT_REPLACE_VALUE = 0.0
+"""The default value that NaN or None values are replaced with.
+"""  # pylint: disable=W0105
 
 
 def get_kfold_cross_validator(
-    estimator_class: typing.Union[
-        lightgbm.LGBMClassifier,
-        lightgbm.LGBMRegressor,
-        sklearn.ensemble.RandomForestClassifier,
-        sklearn.ensemble.RandomForestRegressor,
-    ],
-    n_splits: int,
-    n_repeats: int,
-) -> typing.Union[RepeatedStratifiedKFold, RepeatedKFold]:
-    """
-    Based on the type of estimator that is used in the ShapFire method, this
-    method determines how to divide a dataset into training and test folds.
-    Calssifiers use repeated stratified k-fold cross-validation by default while
-    regressors simply use repeated k-Fold cross-validation.
-
-    Args:
-        estimator_class: The scikit-learn or Microsoft LightGBM \
-            tree-based estimator to use. The estimator can either be a \
-            classifier or a regressor.
-        n_splits: The number of folds a dataset should be divided into.
-        n_repeats: The number of times the division of a dataset into a \
-            certain number of folds should be repeated.
-
-    Raises:
-        ValueError: If it could not be determined whether the given \
-            'estimator_class' is a classifier or a regressor."
-
-    Returns:
-        A scikit-learn cross-validator object that splits a given dataset into \
-            training and test folds.
-    """
+    estimator_class,
+    n_splits,
+    n_repeats,
+):
     if is_classifier(estimator_class):
         return RepeatedStratifiedKFold(
             n_splits=n_splits,
@@ -275,18 +103,14 @@ def get_kfold_cross_validator(
             n_repeats=n_repeats,
         )
     else:
-        raise ValueError(
-            "It could not be determined whether the given "
-            + f"'estimator_class': {estimator_class} "
-            + "is a classifier or a regressor."
-        )
+        raise ValueError
 
 
 def get_roc_auc_statistics(
-    estimator: lightgbm.LGBMClassifier,
-    X_test: typing.Union[numpy.ndarray, pandas.DataFrame],
-    y_test: typing.Union[numpy.ndarray, pandas.DataFrame],
-) -> tuple[numpy.ndarray, numpy.ndarray, float]:
+    estimator,
+    X_test,
+    y_test,
+):
     """
     For a binary classification task, compute the Area Under the Receiver
     Operating Characteristic Curve (ROC AUC). The ROC AUC score is calculated
@@ -327,7 +151,1965 @@ def get_roc_auc_statistics(
         )
 
 
-class HyperparameterSearchHelper(BaseEstimator):
+class ShapFire:
+
+    _HISTORY_REQUIRED_FIELDS = [
+        "score",
+        "feature_importances",
+        # Data pertaining to the following fields are not needed anywhere but
+        # returned for the sake of convenience in case a user needs the data...
+        "shap_values",
+    ]
+
+    def __init__(
+        self,
+        estimator_class,
+        scoring,
+        estimator_params=None,
+        n_splits=2,
+        n_repeats=2,
+        random_seed=DEFAULT_RANDOM_SEED,
+        iterations=None,
+    ):
+        # Class vars corresponding to input args
+        self.estimator_class = estimator_class
+        self.scoring = scoring
+        self.estimator_params = estimator_params
+        self.n_splits = n_splits
+        self.n_repeats = n_repeats
+        self.iterations = iterations
+        self.random_seed = random_seed
+
+        # Set random seed for reproducibility purposes
+        np.random.seed(self.random_seed)
+
+        # Public accessible vars associated with the most important features
+        self.selected_features = None
+        self._feature_selector = None
+        self.cut_value = None
+        self.cluster_labels_df = None
+        self.feature_ranking_df = None
+        self._organized_feature_ranking_df = None
+
+        self._cluster_labels = None
+        self._all_feature_names = None
+
+
+        # Internal vars for easy access to data associated with the importance
+        # ranking of features
+        self._history = pd.DataFrame()
+
+    def fit(self, X, y):
+        # Make sure the column names are strings!
+        X.columns = [str(name) for name in X.columns]
+
+        # Determine feature clustering
+        self._feature_selector = FeatureSelectionHelper()
+        self.cluster_labels_df = self._feature_selector._identify_clusters(X=X)
+
+        if self.iterations is None:
+            self.iterations = self._feature_selector.largest_cluster
+
+        # Perform repeated nested Cross-Validation (CV):
+        self._outer_cv_loop(X=X, y=y)
+
+        # Calculate normalized SHAP feature importance scores and pick the best
+        # feature from each of the previously found clusters
+        self._normalized_shap_feature_importance_df = self._calculate_normalized_shap_feature_importance()
+
+        # Select best features
+        self.feature_ranking_df = self._pick_top_k_from_clusters(
+            df=self._normalized_shap_feature_importance_df,
+            top_k=None,
+        )
+
+        # Keep clusters in the order they first appear
+        # then sort within cluster by importance (descending)
+        _feature_ranking_df = self.feature_ranking_df.copy()
+        cluster_ordering = (
+            _feature_ranking_df.reset_index(level=["cluster"])
+            .groupby(by=["cluster"])
+            .head(1)["cluster"]
+            .values
+        )
+        _feature_ranking_df = _feature_ranking_df.reset_index(
+            level=["cluster"]
+        )
+        _feature_ranking_df["cluster"] = pd.Categorical(
+            _feature_ranking_df["cluster"].values,
+            categories=cluster_ordering,
+        )
+        _feature_ranking_df.sort_values(
+            by=["cluster", "normalized_feature_importance"],
+            ascending=[True, False],
+            inplace=True,
+        )
+        self._organized_feature_ranking_df = _feature_ranking_df
+        self._cluster_labels = self._organized_feature_ranking_df["cluster"].values
+        self._all_feature_names = self._organized_feature_ranking_df.index.get_level_values("feature_name").values
+
+        selected_features = (
+            self.feature_ranking_df.copy()
+            .groupby(level="cluster", sort=False)
+            .head(1)
+        )
+
+        # Discard features with 0 importance. A selected feature should not have 0 importance!
+        selected_features = selected_features[
+            selected_features["normalized_feature_importance"] > 0
+        ]
+
+        # Further filtering based on a cutoff value
+        self.cut_value = self._find_cutoff(df=selected_features)
+        selected_features = selected_features[
+            selected_features["normalized_feature_importance"] >= self.cut_value
+        ]
+
+        selected_feature_names = [v[0] for v in selected_features.index.values]
+        self.selected_features = selected_feature_names
+        return self
+
+    def _calculate_normalized_shap_feature_importance(self):
+        # Validate and check necessary data before proceeding
+        if self._history is None:
+            raise ValueError(
+                "Internal error. The internal class variable "
+                + "'._history' is None. This should not happend if "
+                + "the method is called via the '.fit(X, y)' method."
+            )
+        if self._feature_selector is None:
+            raise ValueError(
+                "Internal error. The internal class variable "
+                + "'._feature_selector' is None. This should not happend if "
+                + "the method is called via the '.fit(X, y)' method."
+            )
+        if self._feature_selector._cluster_labels_df is None:
+            raise ValueError(
+                "Internal error. The internal class variable "
+                + "'._feature_selector._df_cluster_labels ' is None. This "
+                + "should not happend if the method is called via the "
+                + "'.fit(X, y)' method."
+            )
+
+        # Verify that all required data is contained in 'self._history'
+        for column_name in self._HISTORY_REQUIRED_FIELDS:
+            if column_name not in self._history.columns:
+                raise ValueError(
+                    f"The column name {column_name} is required but is "
+                    + "not contained in the internally used "
+                    + "'._history' pandas dataframe."
+                )
+        folds = self._history.shape[0]
+        arr = []
+        for i in range(folds):
+            df_fold = (
+                self._history["feature_importances"]
+                .iloc[i]
+                .reset_index(drop=True)
+            )
+            score = self._history["score"].iloc[i][self.scoring]
+
+            # Sum feature importance value such that we can compute a
+            # normalized feature importance value that lies in the range
+            # [0, 1]. This makes it possible to then aggregate and compare
+            # scores across differrent trained models.
+            total = df_fold["feature_importance"].sum()
+
+            # Create new column with normalized feature importance scores
+            df_fold["normalized_feature_importance"] = (
+                df_fold["feature_importance"] / total
+            )
+
+            # Enumerate CV folds from 1...
+            df_fold.index = df_fold.index + 1
+            for index, row in df_fold.iterrows():
+                d = {
+                    "test_fold": i + 1,
+                    # Set the feature name
+                    "feature_name": row["feature_name"],
+                    # Set the normalized feature importance score calculated
+                    # based on the outer loop CV test fold
+                    "normalized_feature_importance": row[
+                        "normalized_feature_importance"
+                    ],
+                    # Set the rank of the feature. The rank is based on the
+                    # computed 'normalized_feature_importance'
+                    "feature_rank": index,
+                    # Set the performance score that was calculated based on
+                    # the outer loop CV test fold
+                    "score": score,
+                    # Retrieve the cluster that the feature belongs to
+                    "cluster": self._feature_selector._cluster_labels_df[
+                        self._feature_selector._cluster_labels_df[
+                            "feature_name"
+                        ]
+                        == row["feature_name"]
+                    ]["cluster_label"].iat[0],
+                }
+                arr.append(d)
+        return pd.DataFrame(data=arr)
+
+    def _pick_top_k_from_clusters(
+        self,
+        df,
+        top_k=None,
+    ):
+        REQUIRED_FIELDS = [
+            "feature_name",
+            "cluster",
+            "normalized_feature_importance",
+        ]
+        # Validate input arguments before proceeding
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError(
+                "The internally passed input argument 'df' is not of type "
+                + f"'DataFrame'. 'df' is instead of type {type(df)}."
+            )
+        else:
+            # Verify that all required data is contained in input argument 'df'
+            for column_name in REQUIRED_FIELDS:
+                if column_name not in list(df.columns):
+                    raise ValueError(
+                        f"The column name {column_name} is required but is "
+                        + "not contained in the internally passed input "
+                        + "argument 'df' pandas dataframe."
+                    )
+
+        # Extract necessary data
+        # TODO: Maybe make it possible to choose between agg("median") and
+        #       agg("mean")?
+        _df = (
+            df[REQUIRED_FIELDS]
+            .groupby(by=["feature_name", "cluster"])
+            .agg("median")
+            .sort_values(
+                by=["normalized_feature_importance"],
+                ascending=False,
+            )
+            .groupby(by=["cluster"])
+        )
+
+        if top_k is not None:
+            # Return the top k best ranked features from each cluster
+            return _df.head(top_k)
+        else:
+            # Return all features from each cluster
+            return _df.head(np.inf)
+
+    def _find_cutoff(self, df: pd.DataFrame, relative_change: float = 0.001) -> float:
+        """
+        Returns an importance threshold. Keep features that have a larger
+        value then the threshold.
+        Note that: 'df' has a MultiIndex with level 0 = 'cluster' and a
+        column 'normalized_feature_importance' in [0, 1].
+        We first take the max per cluster, sort in descending order, then
+        pick the largest prefix whose cumulative mass <= total / (1 + relative_change).
+        """
+        # # Aggregate: largest score per cluster
+        s = (
+            df.groupby(level=0)["normalized_feature_importance"]
+            .max()
+            .sort_values(ascending=False)
+        )
+
+        # Handle edge cases
+        if len(s) == 0:
+            return 0.0
+        total = float(s.sum())
+        if total == 0.0:
+            # If we get all zeros, then there is nothing to separate
+            # so choose 0 as threshold
+            return 0.0
+
+        tau = float(relative_change)
+        target = total / (1.0 + tau)
+
+        # Find the largest k with cumsum[k-1] <= target
+        cs = s.cumsum().values
+        k = np.searchsorted(cs, target, side="right")
+
+        if k <= 0:
+            # target is smaller than the top feature; keep at least the top one
+            cutoff = float(s.iloc[0])
+        else:
+            # threshold is the smallest value among the kept features
+            cutoff = float(s.iloc[k - 1])
+
+        return cutoff
+
+    def _reorganize_feature_importance_values(
+        self,
+        df,
+    ):
+        # Organize data per tested feature subset
+        fsc = FeatureSubsetCollection()
+        for _, _df in df.groupby("test_fold"):
+            reduced_df = _df[
+                [
+                    "test_fold",
+                    "feature_name",
+                    "normalized_feature_importance",
+                ]
+            ]
+            pivot_df = reduced_df.pivot(
+                index=["test_fold"],
+                columns=["feature_name"],
+                values=["normalized_feature_importance"],
+            )
+            pivot_df = pivot_df["normalized_feature_importance"].reset_index(
+                drop=True
+            )
+            pivot_df.columns.name = None
+            names = list(pivot_df.columns)
+            feature_names = sorted(names)
+            key = "-".join(feature_names)
+            fsc._add_entries(key, pivot_df)
+        return fsc._data_dict
+
+    def _get_score(
+        self,
+        estimator,
+        X_test,
+        y_test,
+    ):
+        dict_ = {}
+        if is_classifier(self.estimator_class):
+            # Handle special scoring functions where additional data, beyond
+            # just a score,  needs to be saved and passed on
+            if self.scoring == "roc_auc":
+                fpr, tpr, roc_auc = get_roc_auc_statistics(
+                    estimator=estimator,
+                    X_test=X_test,
+                    y_test=y_test,
+                )
+                dict_["fpr"] = fpr
+                dict_["tpr"] = tpr
+                dict_["roc_auc"] = roc_auc
+
+                # # Get confusion matrices
+                # conf_matrices = get_conf_matrices(
+                #     estimator=estimator,
+                #     X_test=X_test,
+                #     y_test=y_test,
+                # )
+                # dict_["conf_matrices"] = conf_matrices
+                return dict_
+            else:
+                raise ValueError("TODO: Not yet implemented!")
+        elif is_regressor(self.estimator_class):
+            raise ValueError("TODO: Not yet implemented!")
+        else:
+            raise ValueError(
+                "It could not be determined whether the given "
+                + f"'estimator': {estimator} is a classifier or a regressor."
+            )
+
+    def _outer_cv_loop(
+        self,
+        X,
+        y,
+    ) -> None:
+        """
+        Given a dataset perform repeated cross-validation to estimate SHAP
+        values and thus the importance of the different features that are
+        contained in the input dataset.
+
+        Args:
+            X: The original input dataset that the ShapFire method is applied \
+                to. The dataset is assumed to contain features (columns) and \
+                corresponding observations (rows).
+            y: The original set of samples associated with the target variable \
+                of the dataset.
+            cv: A scikit-learn cross-validator class for generating train/test \
+                folds.
+
+        Raises:
+            NotImplementedError: If a not yet implemented scoring function is \
+                passed as an argument.
+        """
+        history = []
+        repeat_number = 1
+
+        cv = get_kfold_cross_validator(
+            estimator_class=self.estimator_class,
+            n_repeats=self.n_repeats,
+            n_splits=self.n_splits,
+        )
+        feature_clusters = list(
+            self._feature_selector.feature_clusters  # type: ignore
+        )
+        cs = ClusterSampler(feature_clusters=feature_clusters)
+
+        for _ in range(self.iterations):  # type: ignore
+            selected_features = cs.sample_feature_subset()
+            for i, (train_ix, test_ix) in enumerate(cv.split(X=X, y=y)):
+                X_train, X_test = X.iloc[train_ix, :], X.iloc[test_ix, :]
+                y_train, y_test = y.values[train_ix], y.values[test_ix]
+
+                _X_train, _y_train = X_train[selected_features], y_train
+                estimator = self.estimator_class(
+                    random_state=self.random_seed, verbosity=-1,
+                ).fit(
+                    X=_X_train,
+                    y=_y_train.ravel(),
+                )
+
+                # Retrieve SHAP values on outer loop CV test set using
+                # best estimator refitted on inner loop CV training + test set
+                shap_values = shap.TreeExplainer(estimator).shap_values(
+                    X_test[selected_features]
+                )
+                values = np.abs(shap_values).mean(axis=0)
+
+                feature_importances = pd.DataFrame(
+                    list(zip(selected_features, values)),
+                    columns=["feature_name", "feature_importance"],
+                )
+
+                feature_importances.sort_values(
+                    by=["feature_importance"],
+                    ascending=False,
+                    inplace=True,
+                )
+                score = self._get_score(
+                    estimator=estimator,
+                    X_test=X_test[selected_features],
+                    y_test=y_test,
+                )
+                if score is None:
+                    raise NotImplementedError(
+                        f"The scorer '{self.scoring}' has not yet been "
+                        + "implemented for use with ShapFire."
+                    )
+                dict_ = {
+                    # 'score' a dictionary that contains data pertaining to
+                    # the estimate of the performance on the outer loop CV test
+                    # set using a certain scoring measure specified by
+                    # 'self.scoring'.
+                    "score": score,
+                    # 'feature_importance' is dataframe that contains feature
+                    # names and corresponding importance values for each feature
+                    # selected in the inner CV loop.
+                    "feature_importances": feature_importances,
+                    # 'shap_values' contains the raw numpy array output from the
+                    # SHAP Python library.
+                    "shap_values": shap_values,
+                    "repeat_number": repeat_number,
+                }
+                history.append(dict_)
+                if ((i + 1) % self.n_splits) == 0:
+                    repeat_number += 1
+
+                # Update the progress bar
+                # self._progress_bar.update(1)  # type: ignore
+
+        _history = pd.DataFrame(data=history)
+        # If the current ShapFire object already has a 'self._history'
+        # defined then reset the dataframe so data does not accumulate
+        if self._history is not None:
+            self._history = pd.DataFrame()
+        self._history = pd.concat(
+            [
+                self._history.reset_index(drop=True),
+                _history.reset_index(drop=True),
+            ],
+            ignore_index=True,
+            join="outer",
+            axis=0,
+        )
+
+    def plot_importance(
+        self,
+        plot_type="stripplot",
+        groupby="cluster",
+        rcParams=None,
+        figsize=None,
+        fontsize=10,
+        with_text=True,
+        with_overlay=True,
+        ax=None,
+    ):
+        plotting_interface = ShapFirePlottingInterface(shapfire=self)
+        return plotting_interface.plot_importance(
+            plot_type=plot_type,
+            groupby=groupby,
+            rcParams=rcParams,
+            figsize=figsize,
+            fontsize=fontsize,
+            with_text=with_text,
+            with_overlay=with_overlay,
+            ax=ax,
+        )
+
+
+class FeatureSubsetCollection:
+    def __init__(self):
+        self.feature_subsets = []
+        self._data_dict = {}
+
+    def _add_entries(self, key, data):
+        if key in self._data_dict:
+            self._data_dict[key] = pd.concat(
+                [
+                    self._data_dict[key].reset_index(drop=True),
+                    data.reset_index(drop=True),
+                ],
+                ignore_index=True,
+                join="outer",
+                axis=0,
+            )
+        else:
+            self._data_dict[key] = data
+
+
+def cramers_v(
+    x,
+    y,
+    bias_correction,
+):
+    confusion_matrix = pd.crosstab(index=x, columns=y)
+    chi2, _, _, _ = stats.chi2_contingency(confusion_matrix)
+    n = confusion_matrix.sum().sum()
+    phi2 = chi2 / n
+    r, k = confusion_matrix.shape
+    if bias_correction:
+        phi2corr = np.maximum(0, phi2 - ((k - 1) * (r - 1)) / (n - 1))
+        rcorr = r - ((r - 1) ** 2) / (n - 1)
+        kcorr = k - ((k - 1) ** 2) / (n - 1)
+        if np.minimum((kcorr - 1), (rcorr - 1)) == 0:
+            print(
+                "Unable to calculate Cramer's V using bias correction. "
+                + "Consider using bias_correction=False"
+            )
+            return np.nan
+        else:
+            return np.sqrt(phi2corr / np.minimum((kcorr - 1), (rcorr - 1)))
+    else:
+        if np.minimum(k - 1, r - 1) == 0:
+            return np.nan
+        else:
+            return np.sqrt(phi2 / np.minimum(k - 1, r - 1))
+
+
+def correlation_ratio(
+    categories,
+    measurements,
+):
+    categories = categories.values
+    measurements = measurements.values
+    fcat, _ = pd.factorize(categories)
+    cat_num = np.max(fcat) + 1
+    y_avg_array = np.zeros(cat_num)
+    n_array = np.zeros(cat_num)
+    for i in range(0, cat_num):
+        cat_measures = measurements[np.argwhere(fcat == i).flatten()]
+        n_array[i] = len(cat_measures)
+        y_avg_array[i] = np.average(cat_measures)
+    y_total_avg = np.sum(np.multiply(y_avg_array, n_array)) / np.sum(n_array)
+    numerator = np.sum(
+        np.multiply(
+            n_array,
+            np.power(
+                np.subtract(
+                    y_avg_array,
+                    y_total_avg,
+                ),
+                2,
+            ),
+        )
+    )
+    denominator = np.sum(
+        np.power(
+            np.subtract(
+                measurements,
+                y_total_avg,
+            ),
+            2,
+        )
+    )
+    if numerator == 0:
+        eta = 0.0
+    else:
+        eta = np.sqrt(numerator / denominator)
+    return eta
+
+
+def associations(
+    X,
+):
+    # Extract dataframe column labels
+    columns = X.columns
+
+    _X = X.dropna(axis=0, inplace=False)
+
+    # Identify categorical features and columns
+    cat_columns = _X.select_dtypes(include=["category"]).columns
+
+    # Create dataframe for storing associations values
+    c = pd.DataFrame(index=columns, columns=columns)
+
+    # Find columns consisting of the same value
+    single_value_columns_set = set()
+    for column in columns:
+        if _X[column].unique().size == 1:
+            single_value_columns_set.add(column)
+
+    # Compute feature associations
+    for i in range(0, len(columns)):
+        if columns[i] in single_value_columns_set:
+            c.loc[:, columns[i]] = 0.0
+            c.loc[columns[i], :] = 0.0
+        for j in range(i, len(columns)):
+            if columns[j] in single_value_columns_set:
+                continue
+            elif i == j:
+                c.loc[columns[i], columns[j]] = 1.0
+            else:
+                if columns[i] in cat_columns:
+                    if columns[j] in cat_columns:
+                        cell = cramers_v(
+                            _X[columns[i]],
+                            _X[columns[j]],
+                            bias_correction=False,
+                        )
+                        ij, ji = cell, cell
+                    else:
+                        cell = correlation_ratio(
+                            _X[columns[i]],
+                            _X[columns[j]],
+                        )
+                        ij, ji = cell, cell
+                else:
+                    if columns[j] in cat_columns:
+                        cell = correlation_ratio(
+                            _X[columns[j]],
+                            _X[columns[i]],
+                        )
+                        ij, ji = cell, cell
+                    else:
+                        cell, _ = stats.spearmanr(
+                            _X[columns[i]],
+                            _X[columns[j]],
+                        )
+                        ij, ji = cell, cell
+                c.loc[columns[i], columns[j]] = (
+                    ij if not np.isnan(ij) and abs(ij) < np.inf else 0.0
+                )
+                c.loc[columns[j], columns[i]] = (
+                    ji if not np.isnan(ji) and abs(ji) < np.inf else 0.0
+                )
+    # c.fillna(value=np.nan, inplace=True)
+    # return c
+    return c.fillna(value=np.nan, inplace=False)
+
+
+class AutoHierarchicalAssociationClustering:
+
+    def __init__(
+        self,
+        linkage_methods,
+        cluster_distance_threshold=None,
+    ):
+        """
+        Initialize an 'AutoHierarchicalAssociationClustering' object.
+
+        Args:
+            linkage_methods: List of possible linkage methods to use in the \
+                hierarchical agglomerative clustering of highly \
+                associated/correlated features.
+            cluster_distance_threshold: The \
+                distance threshold to apply when forming flat clusters. \
+                Defaults to None.
+        """
+        # Class variables corresponding to calss input arguments
+        self.linkage_methods = linkage_methods
+        self.cluster_distance_threshold = cluster_distance_threshold
+
+        # Internal variables for easy access to data associated with the best
+        # clustering of features
+        self._idx = None
+        self._idx_to_cluster_array = None
+        self._df = None
+
+        # Publically accessible variables associated with the best clustering
+        # of features. These variables wil eventually be set after a call to
+        # 'fit()'
+        self.clustered_association_matrix = None
+        self.linkage_method = None
+        self.linkage = None
+        self.cophenetic_coeficient = None
+
+    def fit(self, X):
+        if not isinstance(X, pd.DataFrame):
+            raise ValueError
+        # Make sure the matrix is square
+        if X.shape[0] != X.shape[1]:
+            raise ValueError
+        # Make sure input is a similarity matrix consisting of values in the
+        # range [-1, 1]. For example correlation is in the range [-1, 1]
+        if True in np.unique(X[(X >= -1) & (X <= 1)].isnull()):
+            raise ValueError
+        # Turn the association matrix X into a dissimilarity matrix
+        _X = 1 - np.abs(X)
+        # Fill the diagonal elements in the matrix with zeros
+        np.fill_diagonal(_X.values, 0)
+        # Make sure the matrix is symmetric
+        pairwise_distances = squareform(X=_X, checks=False, force="tovector")
+        # If no distance threshold is given then use 0.5 as the threshold
+        if self.cluster_distance_threshold is None:
+            self.cluster_distance_threshold = 0.5
+        clustering_info = [{} for _ in range(len(self.linkage_methods))]
+        for i in range(0, len(self.linkage_methods)):
+            clustering_info[i] = self._perform_feature_clustering(
+                X=_X,
+                linkage_method=self.linkage_methods[i],
+                pairwise_distances=pairwise_distances,
+            )
+
+        # Save clustering results in sorted order
+        self._df = pd.DataFrame(data=clustering_info).sort_values(
+            by=["cophenetic_coefficient"],
+            ascending=False,
+        )
+        # Set the best parameter values that have been found
+        row = self._df.iloc[0]
+        self._idx = row["idx"]
+        self._idx_to_cluster_array = row["idx_to_cluster_array"]
+        self.linkage_method = row["linkage_method"]
+        self.cophenetic_coefficient = row["cophenetic_coefficient"]
+
+        # Continue if the best parameter values have been set correctly
+        if self._idx is not None:
+            self.clustered_association_matrix = X.iloc[self._idx, :].T.iloc[
+                self._idx, :
+            ]
+            # return self
+            return self._idx_to_cluster_array
+        else:
+            raise ValueError(
+                "Internal error. The indexing array '._idx' is None. "
+            )
+
+    def _perform_feature_clustering(
+        self,
+        X,
+        linkage_method,
+        pairwise_distances,
+    ):
+        """
+        Given the necessary data, perform hierachical agglomerative clustering
+        and evaluate the quality of the obtained clustering.
+
+        Args:
+            X: The dataset whose features are to be clustered.
+            linkage_method: The linkage method to use when applying \
+                hierachical agglomerative clustering to group highly \
+                associated/correlated features.
+            pairwise_distances: The pairwise distances between features, of a \
+                dataset, representing the dissimilarity between features.
+
+        Returns:
+            Data pertaining to the obtained clutering of features along with \
+            different statistics that can be used to evaluate the quality of \
+            the obtained clustering.
+        """
+        if not isinstance(X, pd.DataFrame):
+            raise ValueError(
+                "The given input arugment 'X' should be of type "
+                + f"'DataFrame' but is intead of type '{type(X)}'."
+            )
+        # A linkage method is used to compute the distance between two clusters
+        linkage = hac.linkage(y=pairwise_distances, method=linkage_method)
+        idx_to_cluster_array = hac.fcluster(
+            Z=linkage,
+            t=self.cluster_distance_threshold,
+            # criterion="distance" --> Forms flat clusters so that the original
+            # observations in each flat cluster have no greater a cophenetic
+            # distance than t = self.cluster_distance_threshold.
+            criterion="distance",
+        )
+        idx = np.argsort(idx_to_cluster_array)
+
+        # Compute the cophenetic correlation coefficient
+        cophenetic_coef, _ = hac.cophenet(Z=linkage, Y=pairwise_distances)
+        cluster_labels = np.unique(idx_to_cluster_array)
+
+        # Return data associated with the obtained clustering so we subsequently
+        # can determine the best approach
+        return {
+            "linkage_method": linkage_method,
+            "cophenetic_coefficient": cophenetic_coef,
+            "idx_to_cluster_array": idx_to_cluster_array,
+            "idx": idx,
+            "linkage_object": linkage,
+        }
+
+
+def _identify_colinear_features(
+    # NOTE: Internal method. Assume 'df' is passed as a pd dataframe
+    df,
+    linkage_methods=LINKAGE_METHODS,
+):
+    # Determine the pairwise strength of association/correlation between features
+    feature_associations = associations(X=df)
+
+    # Cluster collinear/multicollinear features
+    _idx_to_cluster_array = AutoHierarchicalAssociationClustering(
+        linkage_methods=linkage_methods
+    ).fit(feature_associations)
+
+    # Organize information in a dictionary and then a dataframe
+    # Use defaultdict to automatically create empty lists as values for missing keys
+    dict_cluster_labels = defaultdict(list)
+
+    # # Extract a list of feature names
+    feature_names = df.columns.to_list()
+
+    # Extract all cluster labels
+    if _idx_to_cluster_array is not None:
+        # Populate each of the lists associated with a cluster with feature names
+        for i in range(len(_idx_to_cluster_array)):
+            cluster_label = _idx_to_cluster_array[i]
+            dict_cluster_labels[cluster_label].append(str(feature_names[i]))
+
+        # Convert defaultdict back to a regular dict if necessary
+        dict_cluster_labels = dict(dict_cluster_labels)
+
+        lst = []
+        for label in dict_cluster_labels:
+            for feature_name in dict_cluster_labels[label]:
+                d = {"cluster_label": label, "feature_name": feature_name}
+                lst.append(d)
+        df_cluster_labels = pd.DataFrame(data=lst)
+        return df_cluster_labels
+    else:
+        raise ValueError
+
+
+class FeatureSelectionHelper:
+
+    def __init__(
+        self,
+    ):
+        self._cluster_labels_df = None
+
+    @property
+    def nclusters(self):
+        if self._cluster_labels_df is not None:
+            return np.unique(
+                self._cluster_labels_df["cluster_label"].values
+            ).shape[0]
+        else:
+            raise ValueError
+
+    @property
+    def largest_cluster(self):
+        cluster_size_max = 0
+        if self._cluster_labels_df is not None:
+            for _, df in self._cluster_labels_df.groupby("cluster_label"):
+                cluster_size = df.shape[0]
+                if cluster_size > cluster_size_max:
+                    cluster_size_max = cluster_size
+            return cluster_size_max
+        else:
+            raise ValueError
+
+    @property
+    def feature_clusters(self):
+        if self._cluster_labels_df is not None:
+            feature_clusters = []
+            for _, df in self._cluster_labels_df.groupby("cluster_label"):
+                feature_clusters.append(df["feature_name"].to_list())
+            return feature_clusters
+        else:
+            raise ValueError
+
+    def _identify_clusters(
+        self,
+        X,
+    ):
+        _X = X.dropna(axis=0)
+        self._cluster_labels_df = _identify_colinear_features(df=_X)
+        return self._cluster_labels_df
+
+
+class Cluster:
+    def __init__(self, feature_names):
+        _feature_names = {label: 0 for label in feature_names}
+        self.feature_names = OrderedDict(
+            sorted(_feature_names.items(), key=itemgetter(1))
+        )
+
+    def get_feature(self):
+        return self._first(self.feature_names)
+
+    def update_counter(self, feature_name):
+        self.feature_names[feature_name] += 1
+        # Update the odered dictionary with new counts
+        self.feature_names = OrderedDict(
+            sorted(self.feature_names.items(), key=itemgetter(1))
+        )
+
+    def _first(self, collection):
+        """
+        Return the first element from an ordered collection or an arbitrary
+        element from an unordered collection.
+
+        Raise StopIteration if the collection is empty.
+        """
+        return next(iter(collection))
+
+
+class ClusterSampler:
+    def __init__(self, feature_clusters):
+        self.clusters = {}
+        counter = 0
+        for feature_names in feature_clusters:
+            self.clusters[f"cluster{counter}"] = Cluster(
+                feature_names=feature_names
+            )
+            counter += 1
+
+    def sample_feature_subset(self):
+        feature_subset = []
+        for cluster_label in self.clusters:
+            feature_name = self.clusters[cluster_label].get_feature()
+            feature_subset.append(feature_name)
+            self.clusters[cluster_label].update_counter(feature_name)
+        return feature_subset
+
+
+# Define the main color palette to use for plots and other illustations
+MAIN_COLOR_PALETTE = {
+    "background": "#feffff",
+    "selected": "#25c5da",
+    "rejected": "#010105",
+    "secondary": "#c53e6e",
+    "tertiary": "#3e77bf",
+    "overlay": "#9c9d9d",
+    "grid": "#d2d2d2",
+}
+
+# Define the main matplotlib and seaborn plotting settings
+DEFAULT_PLOTTING_SETTINGS = {
+    "axes.facecolor": MAIN_COLOR_PALETTE["background"],
+    "patch.edgecolor": MAIN_COLOR_PALETTE["background"],
+    "figure.facecolor": MAIN_COLOR_PALETTE["background"],
+    "axes.edgecolor": MAIN_COLOR_PALETTE["background"],
+    "savefig.edgecolor": MAIN_COLOR_PALETTE["background"],
+    "savefig.facecolor": MAIN_COLOR_PALETTE["background"],
+    "grid.color": MAIN_COLOR_PALETTE["grid"],
+    "lines.linewidth": 1.30,
+}
+
+
+class ShapFirePlottingInterface:
+    def __init__(self, shapfire):  # type: ignore
+        # Class vars corresponding to input args
+        self.shapfire = shapfire  # noqa
+
+        # Internal vars for easy access to data associated with the importance
+        # ranking of features
+        self._data = None
+        self._is_jointplot = False
+        self._groupby = None
+
+    def _organize_data_for_plotting(
+        self,
+        feature_ranking_df,
+        df,
+        groupby,
+    ):
+        """
+        Organize and structure the results obtained by applying ShapFire such
+        that the results can easily be plotted and displayed in a figure.
+
+        Args:
+            feature_ranking_df: _description_
+            df: A dataframe containing all the necessary data for visualizing \
+                the importance ranking of features.
+            groupby: A string value indicating how the feature importance \
+                ranking should be displayed in a figure. If the option \
+                'cluster' is chosen, then the features are grouped and shown \
+                in the figure based on their assigned cluster and according to \
+                the importance rank of the best feautre in the cluster. If \
+                'feature' is chosen, then the features are shown in the figure \
+                purely according to their global rank without any \
+                consideration to what cluster each features are a part of.
+
+        Raises:
+            TypeError: If the input argument 'groupby' is not a string.
+            ValueError: If the input argument 'groupby' is not a valid option.
+
+        Returns:
+            Organized and structured data of ShapFire results that can be \
+            passed on to appropriate plotting methods.
+        """
+        if not isinstance(groupby, str):
+            raise TypeError(
+                "Function argument 'groupby' should be of type 'str' but "
+                + f"argument of type {type(groupby)} was given."
+            )
+        else:
+            names = np.unique(df["feature_name"]).tolist()
+            template_dict = {n: np.nan for n in names}
+            data = []
+            if groupby.strip().lower() == "feature":
+                indexing = (
+                    df[["feature_name", "normalized_feature_importance"]]
+                    .groupby("feature_name")
+                    .agg("median")
+                    .sort_values(
+                        by=["normalized_feature_importance"],
+                        ascending=True,
+                    )
+                    .index
+                )
+                for _name, _df in df[
+                    ["feature_name", "normalized_feature_importance"]
+                ].groupby("feature_name"):
+                    for _, _row in _df.iterrows():
+                        dict_ = template_dict.copy()
+                        dict_[_name] = _row["normalized_feature_importance"]
+                        data.append(dict_)
+                # Return tuple:
+                # - Data
+                # - Vertical ordering by feature name according to feature
+                #   importance rank
+                new_df = pd.DataFrame(data=data).reindex(indexing, axis=1)
+                return new_df, list(reversed(new_df.columns.values))
+            elif groupby.strip().lower() == "cluster":
+                indexing = feature_ranking_df.index.values
+                for _name, _df in df[
+                    ["feature_name", "normalized_feature_importance"]
+                ].groupby("feature_name"):
+                    for _, _row in _df.iterrows():
+                        dict_ = template_dict.copy()
+                        dict_[_name] = _row["normalized_feature_importance"]
+                        data.append(dict_)
+                # Return tuple:
+                # - Data
+                # - Vertical ordering by feature name according to feature
+                #   importance rank and cluster label
+                new_df = pd.DataFrame(data=data).reindex(indexing, axis=1)
+                return new_df, list(new_df.columns.values)
+            else:
+                raise ValueError(
+                    "The given input argument 'groupby' should have value "
+                    + f"'feature' or 'cluster' but a value '{groupby}' was "
+                    + "given."
+                )
+
+    def _prepare_data(self):
+        plotting_df, feature_ordering = self._organize_data_for_plotting(
+            df=self.shapfire._normalized_shap_feature_importance_df,
+            feature_ranking_df=self.shapfire._organized_feature_ranking_df,
+            groupby="cluster",
+        )
+
+        # Set colors for each selected/rejected feature
+        feature_colors = {}
+        for feature_name in self.shapfire._all_feature_names:
+            if feature_name in self.shapfire.selected_features:
+                feature_colors[feature_name] = MAIN_COLOR_PALETTE["selected"]
+            else:
+                feature_colors[feature_name] = MAIN_COLOR_PALETTE["rejected"]
+
+        return {
+            # Main importance plot fields...
+            "df": self.shapfire._normalized_shap_feature_importance_df,
+            "feature_ordering": feature_ordering,
+            "feature_colors": feature_colors,
+            "selected_features": self.shapfire.selected_features,
+            # "all_features": all_features,
+            # "all_features": None,
+            "all_feature_names": self.shapfire._all_feature_names,
+            "cluster_labels": self.shapfire._cluster_labels,
+            "plotting_df": plotting_df,
+        }
+
+    def _add_cluster_overlays(
+        self,
+        ax,
+        cluster_labels,
+        fontsize=10,
+        with_text=True,
+        with_overlay=True,
+        x_offset=0,
+    ):
+        # y-offset. Move text slightly down
+        text_placement_offset = 0.00
+        current_cluster_label = cluster_labels[0]
+        lower_value = -0.5
+        upper_value = 0.5
+        last_index = len(cluster_labels[1:]) + 1
+
+        # Alpha values associated with the two alternating overlays
+        alphas = [0.05, 0.25]
+
+        # Values pertaining to first cluster overlay
+        counter0 = 1
+        counter1 = 0
+        alpha = alphas[(counter1 + 1) % 2]
+
+        # Add overlays by looping over cluster labels associated
+        # with each feature present in the input dataset
+        for i in range(1, last_index):
+            if current_cluster_label != cluster_labels[i]:
+                if with_overlay is True:
+                    ax.axhline(upper_value, color="black", alpha=0.10)
+                    ax.axhspan(
+                        lower_value,
+                        upper_value,
+                        facecolor=MAIN_COLOR_PALETTE["overlay"],
+                        alpha=alpha,
+                    )
+                if with_text is True:
+                    ax.text(
+                        x=x_offset,
+                        # Text placement
+                        y=lower_value
+                        + (upper_value - lower_value) / 2
+                        + text_placement_offset,
+                        s=f"Cluster {current_cluster_label}",
+                        fontsize=fontsize,
+                        verticalalignment="center",
+                    )
+                counter0 = 1
+                counter1 += 1
+                alpha = alphas[(counter1 + 1) % 2]
+                lower_value = upper_value
+                upper_value += 1.00
+            else:
+                counter0 += 1
+                upper_value += 1.00
+            current_cluster_label = cluster_labels[i]
+        if with_overlay is True:
+            ax.axhspan(
+                lower_value,
+                upper_value,
+                facecolor=MAIN_COLOR_PALETTE["overlay"],
+                alpha=alpha,
+            )
+        if with_text is True:
+            ax.text(
+                x=x_offset,
+                # Text placement
+                y=lower_value
+                + (upper_value - lower_value) / 2
+                + text_placement_offset,
+                s=f"Cluster {current_cluster_label}",
+                fontsize=fontsize,
+                verticalalignment="center",
+            )
+
+    def _add_feature_overlays(
+        self,
+        ax,
+        cluster_labels,
+    ):
+        cluster_labels[0]
+        lower_value = -0.5
+        upper_value = 0.5
+        last_index = len(cluster_labels[1:]) + 1
+
+        # Opacity values associated with the two alternating overlays
+        alphas = [0.05, 0.25]
+
+        # Values pertaining to first cluster overlay
+        counter1 = 0
+        alpha = alphas[(counter1 + 1) % 2]
+
+        # Add overlays
+        for _ in range(1, last_index):
+            ax.axhline(upper_value, color="black", alpha=0.10)
+            ax.axhspan(
+                lower_value,
+                upper_value,
+                facecolor=MAIN_COLOR_PALETTE["overlay"],
+                alpha=alpha,
+            )
+            counter1 += 1
+            alpha = alphas[(counter1 + 1) % 2]
+            lower_value = upper_value
+            upper_value += 1.00
+        ax.axhspan(
+            lower_value,
+            upper_value,
+            facecolor=MAIN_COLOR_PALETTE["overlay"],
+            alpha=alpha,
+        )
+
+    def ceil5(self, x):
+        """
+        Given an input value round the value to closest and largest multiple of
+        5.
+
+        Args:
+            x: A value that is to be rounded.
+
+        Returns:
+            The input value rounded to the closest and largest multiple
+            of 5.
+        """
+        base = 5
+        return int(base * np.ceil(x / base))
+
+    def plot_importance(
+        self,
+        plot_type="stripplot",
+        groupby="cluster",
+        rcParams=None,
+        figsize=None,
+        fontsize=10,
+        with_text=True,
+        with_overlay=True,
+        ax=None,
+    ):
+        # Define the default plotting options
+        PLOT_IMPORTANCE_OPTIONS = {
+            # Do not allow violinplot. The elements will be squished too
+            # much and result in an awful representation of the data
+            "stripplot": {
+                "func": sns.stripplot,
+                "xargs": {"dodge": True, "alpha": 0.66, "ax": ax},
+            },
+            "swarmplot": {
+                "func": sns.swarmplot,
+                "xargs": {},
+            },
+            "boxplot": {
+                "func": sns.boxplot,
+                "xargs": {
+                    "medianprops": {
+                        "color": "white",
+                        "linewidth": 1.25,
+                    },
+                    "boxprops": {
+                        "linewidth": 0.5,
+                    },
+                    "whiskerprops": {
+                        "linewidth": 1.5,
+                    },
+                    "capprops": {
+                        "linewidth": 1.5,
+                    },
+                },
+            },
+        }
+
+        # Validate given input arguments
+        if not isinstance(plot_type, str):
+            raise TypeError(
+                "The given input argument 'plot_type' should be of type "
+                + f"'str' but argument of type '{type(plot_type)}' was given."
+            )
+        else:
+            _PLOT_OPTIONS = list(PLOT_IMPORTANCE_OPTIONS.keys())
+            if not plot_type.strip().lower() in _PLOT_OPTIONS:
+                raise ValueError(
+                    "The given input argument 'plot_type' should be one "
+                    + f"of the following options: {', '.join(_PLOT_OPTIONS)} "
+                    + f" but an argument '{plot_type}' was given."
+                )
+
+        if not isinstance(groupby, str):
+            raise TypeError(
+                "The given input argument 'groupby' should be of type "
+                + f"'str' but an argument of type '{type(groupby)}' was given."
+            )
+        else:
+            GROUBPBY_OPTIONS = ["feature", "cluster"]
+            if not groupby.strip().lower() in GROUBPBY_OPTIONS:
+                raise ValueError(
+                    "The given input argument 'plot_type' should be one "
+                    + f"of the following options: {', '.join(_PLOT_OPTIONS)} "
+                    + f" but an argument '{plot_type}' was given."
+                )
+        if ax is None:
+            # No axis was passed as function input argument. Thus create a new
+            # axis object
+            fig, ax = plt.subplots(nrows=1, ncols=1)
+        else:
+            # Get figure from the Axes object so we can subsequently apply
+            # styling to it
+            fig = ax.get_figure()
+
+        # Apply styling to the plot elements
+        self._apply_styling(rcParams)
+
+        # Prepare the appropriate data for plotting
+        _groupby = groupby.strip().lower()
+        if self._data is None or _groupby != self._groupby:
+            # self._data = self._prepare_data(groupby=_groupby)
+            self._data = self._prepare_data()
+            self._groupby = _groupby
+
+        # Unpack all necessary data for plotting
+        df = self._data["df"]
+        feature_ordering = self._data["feature_ordering"]
+        feature_colors = self._data["feature_colors"]
+        cluster_labels = self._data["cluster_labels"]
+
+        # Determine the searborn function to use for plotting and set function
+        # arguments that should be passed to the plotting function
+        args = {
+            "x": "normalized_feature_importance",
+            "y": "feature_name",
+            "data": df,
+        }
+
+        plotting_function = PLOT_IMPORTANCE_OPTIONS[plot_type]["func"]
+        args.update(PLOT_IMPORTANCE_OPTIONS[plot_type]["xargs"])
+        ax = plotting_function(
+            order=feature_ordering,
+            palette=list(feature_colors.values()),
+            **args,
+        )
+        sns.despine(
+            ax=ax,
+            top=True,
+            right=True,
+            left=True,
+            bottom=True,
+            offset=None,
+            trim=False,
+        )
+
+        x_max = df["normalized_feature_importance"].max().max()
+        df["normalized_feature_importance"].min().min()
+        ax.set_xlim([0.00 - 0.025, x_max + 0.025])
+
+        # Add additional plot overlays depending on how features should be
+        # grouped and displayed in the plot
+        if groupby.strip().lower() == "cluster":
+            if with_text is True or with_overlay is True:
+                # Add two alternating gray-scale colors for grouping features
+                # based on the cluster they each belong to. Also, add text
+                # information about the cluster each feature belongs to
+                self._add_cluster_overlays(
+                    ax=ax,
+                    cluster_labels=cluster_labels,
+                    with_text=with_text,
+                    with_overlay=with_overlay,
+                    x_offset=x_max * 1.10,
+                )
+        # elif groupby.strip().lower() == "feature":
+        #     if with_overlay is True:
+        #         # Add two alternating gray-scale colors for better seperation
+        #         # of the plotted data. By default do not add text information
+        #         # about the clusters each feature belong to. For this purpose,
+        #         # the groupby = "cluster" should be chosen
+        #         self._add_feature_overlays(ax=ax, cluster_labels=cluster_labels)
+        else:
+            raise ValueError(
+                "The given input argument 'groupby' should have value "
+                + f"'feature' or 'cluster' but value '{groupby}' was given."
+            )
+
+        # Add a legend to the figure indicating which feautres have been
+        # selected and which have been rejected
+        custom_lines = [
+            Line2D(
+                [0],
+                [0],
+                color=MAIN_COLOR_PALETTE["selected"],
+                lw=4.5,
+            ),
+            Line2D(
+                [0],
+                [0],
+                color=MAIN_COLOR_PALETTE["rejected"],
+                lw=4.5,
+            ),
+        ]
+        ax.legend(
+            custom_lines,
+            ["Selected", "Rejected"],
+            loc="lower right",
+            fontsize=fontsize + 1,
+        )
+
+        # Make changes related to figure size, title, x-axis labels + ticks,
+        # y-axis labels + and ticks, etc.
+        ax.set_title(
+            "ShapFire importance ranking and selected features",
+            fontsize=fontsize + 1,
+            pad=20,
+        )
+        ax.set_xlabel(
+            "Normalized SHAP feature importance", fontsize=fontsize + 1
+        )
+        # Only display y-axis label if it is plotted alone
+        if self._is_jointplot is False:
+            ax.set_ylabel("Feature name", fontsize=fontsize + 1)
+        else:
+            ax.set_ylabel(None)
+        ax.tick_params(axis="both", which="major", labelsize=fontsize)
+        ax.tick_params(axis="both", which="minor", labelsize=fontsize)
+        ax.set_zorder(1)
+        plt.style.use('ggplot')
+        plt.margins(x=0,y=0)
+
+        # ax.set_ylim([0, len(np.unique(ndf["feature_name"].values)) + 1])
+
+        fig = ax.get_figure()
+        fig.set_size_inches(12, 16)
+        plt.tight_layout(pad=0)
+        return fig, ax
+
+    def _apply_styling(
+        self,
+        rcParams=None,
+    ) -> None:
+        # Apply default styling to the generated plots
+        sns.set_theme(style="whitegrid")
+        if rcParams is not None:
+            mpl.rcParams.update(rcParams)
+        else:
+            sns.set_context("paper", rc=DEFAULT_PLOTTING_SETTINGS)
+
+
+# def plot_roc_curve(
+#     df,
+#     figsize=(8, 4),
+#     plot_all_curves=True,
+#     ax=None,
+#     **kwargs,
+# ):
+#     # Validate given input arguments
+#     if ax is None:
+#         # No axis was passed as function input argument. Thus create a new
+#         # axis object
+#         fig, ax = plt.subplots(nrows=1, ncols=1)
+#     else:
+#         # Get figure from the Axes object so we can subsequently apply
+#         # styling to it
+#         fig = ax.get_figure()
+
+#     # Set linewidths and alpha values for each of the lines in the ROC AUC
+#     # plot
+#     line_linewidth = kwargs.get("line_linewidth", 1.25)
+#     line_alpha = kwargs.get("line_alpha", 0.30)
+#     mean_linewidth = kwargs.get("mean_linewidth", 2.75)
+#     mean_alpha = kwargs.get("mean_alpha", 0.75)
+#     fill_alpha = kwargs.get("fill_alpha", 0.25)
+
+#     # Make sure valid data pertaining to the 'roc_auc' scoring function is
+#     # actually available and set in the 'self.shapfire._history' dataframe
+#     try:
+#         dict = df["score"].iat[0]
+#         fpr, tpr, roc_auc = dict_["fpr"], dict_["tpr"], dict_["roc_auc"]
+#     except KeyError:
+#         raise ValueError(
+#             "This plotting function can only be called if valid data "
+#             + "pertaining to the 'roc_auc' score is availble.."
+#         )
+
+#     # Apply default styling
+#     _apply_default_styling()
+
+#     # Extract necessary data for plotting
+#     tprs = []
+#     aucs = []
+#     mean_fpr = np.linspace(start=0, stop=1, num=100)
+#     counter = 1
+#     #         for _, row in self.shapfire._history.iterrows():
+#     for _, row in df.iterrows():
+#         score = row["score"]
+#         fpr, tpr, roc_auc = score["fpr"], score["tpr"], score["roc_auc"]
+#         # Plot individual ROC lines
+#         if plot_all_curves is True:
+#             _plot_roc_curve(
+#                 ax=ax,
+#                 fpr=fpr,
+#                 tpr=tpr,
+#                 roc_auc=roc_auc,
+#                 fold=counter,
+#                 line_linewidth=line_linewidth,  # type: ignore
+#                 line_alpha=line_alpha,  # type: ignore
+#             )
+#         counter += 1
+
+#         # Perform one-dimensional linear interpolation for monotonically
+#         # increasing sample points
+#         interp_tpr = np.interp(x=mean_fpr, xp=fpr, fp=tpr)
+#         interp_tpr[0] = 0.0
+#         tprs.append(interp_tpr)
+#         aucs.append(roc_auc)
+
+#     # Plot mean of ROC lines
+#     mean_tpr = np.mean(tprs, axis=0)
+#     mean_tpr[-1] = 1.0
+#     mean_auc = auc(mean_fpr, mean_tpr)
+#     std_auc = np.std(aucs, ddof=1)
+#     ax.plot(
+#         mean_fpr,
+#         mean_tpr,
+#         lw=mean_linewidth,
+#         alpha=mean_alpha,
+#         color="b",
+#         label=r"Mean ROC (AUC = %0.2f $\pm$ %0.2f)" % (mean_auc, std_auc),
+#     )
+
+#     # Fill between ROC lines
+#     std_tpr = np.std(tprs, axis=0)
+#     tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
+#     tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
+#     ax.fill_between(
+#         x=mean_fpr,
+#         y1=tprs_lower,
+#         y2=tprs_upper,
+#         color="gray",
+#         alpha=fill_alpha,
+#         label=r"$\pm$ 1 std. dev.",
+#     )
+#     # Random classifier performance line
+#     ax.plot([0, 1], [0, 1], color="navy", lw=1.25, linestyle="--")
+#     sns.despine(
+#         ax=ax,
+#         top=True,
+#         right=True,
+#         left=True,
+#         bottom=True,
+#         offset=None,
+#         trim=True,
+#     )
+
+#     # Create a box to fill with legend entries
+#     box = ax.get_position()
+#     ax.set_position([box.x0, box.y0, box.width * 1.0, box.height])
+#     ncols = _add_dummy_legend_entries(
+#         total_lines=counter, lines_per_inch=4, figsize=figsize, ax=ax
+#     )
+#     # Put a legend to the right of the current axis
+#     legend = ax.legend(
+#         loc="center left",
+#         bbox_to_anchor=(1, 0.5),
+#         ncol=ncols,
+#         fancybox=True,
+#     )
+#     for line in legend.get_lines():
+#         line.set_linewidth(2.5)
+
+#     # Make changes related to figure size, title, x-axis labels + ticks,
+#     # y-axis labels + and ticks, etc.
+#     ax.set_xlim([-0.05, 1.05])
+#     ax.set_ylim([-0.05, 1.05])
+
+#     # Position x and y labels manually
+#     fig.text(
+#         x=0.5,
+#         y=0.010,
+#         s="False positive rate",
+#         ha="center",
+#     )
+#     fig.text(
+#         x=0.0005,
+#         y=0.5,
+#         s="True positive rate",
+#         va="center",
+#         rotation="vertical",
+#     )
+#     fig.subplots_adjust(wspace=0.15, hspace=0.15)
+#     ax.set_title("ROC curves")
+#     return fig, ax
+
+
+# def _plot_roc_curve(
+#     ax,
+#     fpr,
+#     tpr,
+#     roc_auc,
+#     fold,
+#     line_linewidth=1.25,
+#     line_alpha=0.30,
+# ):
+#     ax.plot(
+#         fpr,
+#         tpr,
+#         lw=line_linewidth,
+#         alpha=line_alpha,
+#         label=f"Fold {fold}. ROC (AUC = {roc_auc:.2f})",
+#     )
+#     return ax
+
+
+def plot_roc_curve(
+    df,
+    figsize = (8, 4),
+    plot_all_curves = True,
+    ax = None,
+    **kwargs,
+):
+    # Validate given input arguments
+    if ax is None:
+        # No axis was passed as function input argument. Thus create a new
+        # axis object
+        fig, ax = plt.subplots(nrows=1, ncols=1)
+    else:
+        # Get figure from the Axes object so we can subsequently apply
+        # styling to it
+        fig = ax.get_figure()
+
+    # Set linewidths and alpha values for each of the lines in the ROC AUC
+    # plot
+    line_linewidth = kwargs.get("line_linewidth", 1.25)
+    line_alpha = kwargs.get("line_alpha", 0.30)
+    mean_linewidth = kwargs.get("mean_linewidth", 2.75)
+    mean_alpha = kwargs.get("mean_alpha", 0.75)
+    fill_alpha = kwargs.get("fill_alpha", 0.25)
+
+    # Make sure valid data pertaining to the 'roc_auc' scoring function is
+    # actually available and set in the 'self.shapfire._history' dataframe
+    try:
+        dict_: dict[str, typing.Any] = df["score"].iat[0]
+        fpr, tpr, roc_auc = dict_["fpr"], dict_["tpr"], dict_["roc_auc"]
+    except KeyError:
+        raise ValueError(
+            "This plotting function can only be called if valid data "
+            + "pertaining to the 'roc_auc' score is availble.."
+        )
+
+    # Apply default styling
+    _apply_default_styling()
+
+    # Extract necessary data for plotting
+    tprs = []
+    aucs = []
+    mean_fpr = np.linspace(start=0, stop=1, num=100)
+    counter = 1
+    #         for _, row in self.shapfire._history.iterrows():
+    for _, row in df.iterrows():
+        score: dict[str, typing.Any] = row["score"]
+        fpr, tpr, roc_auc = score["fpr"], score["tpr"], score["roc_auc"]
+        # Plot individual ROC lines
+        if plot_all_curves is True:
+            _plot_roc_curve(
+                ax=ax,
+                fpr=fpr,
+                tpr=tpr,
+                roc_auc=roc_auc,
+                fold=counter,
+                line_linewidth=line_linewidth,  # type: ignore
+                line_alpha=line_alpha,  # type: ignore
+            )
+        counter += 1
+
+        # Perform one-dimensional linear interpolation for monotonically
+        # increasing sample points
+        interp_tpr = np.interp(x=mean_fpr, xp=fpr, fp=tpr)
+        interp_tpr[0] = 0.0
+        tprs.append(interp_tpr)
+        aucs.append(roc_auc)
+
+    # Plot mean of ROC lines
+    mean_tpr = np.mean(tprs, axis=0)
+    mean_tpr[-1] = 1.0
+    mean_auc = auc(mean_fpr, mean_tpr)
+    std_auc = np.std(aucs, ddof=1)
+    ax.plot(
+        mean_fpr,
+        mean_tpr,
+        lw=mean_linewidth,
+        alpha=mean_alpha,
+        color="b",
+        label=r"Mean ROC (AUC = %0.2f $\pm$ %0.2f)" % (mean_auc, std_auc),
+    )
+
+    # Fill between ROC lines
+    std_tpr = np.std(tprs, axis=0)
+    tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
+    tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
+    ax.fill_between(
+        x=mean_fpr,
+        y1=tprs_lower,
+        y2=tprs_upper,
+        color="gray",
+        alpha=fill_alpha,
+        label=r"$\pm$ 1 std. dev.",
+    )
+    # Random classifier performance line
+    ax.plot([0, 1], [0, 1], color="navy", lw=1.25, linestyle="--")
+    sns.despine(
+        ax=ax,
+        top=True,
+        right=True,
+        left=True,
+        bottom=True,
+        offset=None,
+        trim=True,
+    )
+
+    # Create a box to fill with legend entries
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 1.0, box.height])
+    ncols = _add_dummy_legend_entries(
+        total_lines=counter, lines_per_inch=4, figsize=figsize, ax=ax
+    )
+    # Put a legend to the right of the current axis
+    legend = ax.legend(
+        loc="center left",
+        bbox_to_anchor=(1, 0.5),
+        ncol=ncols,
+        fancybox=True,
+    )
+    for line in legend.get_lines():
+        line.set_linewidth(2.5)
+
+    # Make changes related to figure size, title, x-axis labels + ticks,
+    # y-axis labels + and ticks, etc.
+    ax.set_xlim([-0.05, 1.05])
+    ax.set_ylim([-0.05, 1.05])
+
+    # Position x and y labels manually
+    fig.text(
+        x=0.5,
+        y=0.010,
+        s="False positive rate",
+        ha="center",
+    )
+    fig.text(
+        x=0.0005,
+        y=0.5,
+        s="True positive rate",
+        va="center",
+        rotation="vertical",
+    )
+    fig.subplots_adjust(wspace=0.15, hspace=0.15)
+    ax.set_title("ROC curves")
+    return fig, ax
+
+
+def _plot_roc_curve(
+    ax,
+    fpr,
+    tpr,
+    roc_auc,
+    fold,
+    line_linewidth = 1.25,
+    line_alpha = 0.30,
+):
+    ax.plot(
+        fpr,
+        tpr,
+        lw=line_linewidth,
+        alpha=line_alpha,
+        label=f"Fold {fold}. ROC (AUC = {roc_auc:.2f})",
+    )
+    return ax
+
+
+
+def _add_dummy_legend_entries(
+    total_lines,
+    lines_per_inch,
+    figsize,
+    ax,
+):
+    lines_per_inch = 4
+    total_space = figsize[1] * lines_per_inch
+    ncols = int(np.ceil(total_lines / total_space))
+    dummy_lines = int(total_space - (total_lines % total_space))
+    # Add additional dummy legend entries to fill empty space
+    # in the displayed legend
+    for _ in range(dummy_lines):
+        ax.plot([], [], color="black", lw=0, alpha=0, label=" ")
+    return ncols
+
+
+def _apply_default_styling(
+    rcParams=None,
+):
+    # Apply default styling to the generated plots
+    sns.set_theme(style="whitegrid")
+    if rcParams is not None:
+        mpl.rcParams.update(rcParams)
+    else:
+        sns.set_context("paper", rc=DEFAULT_PLOTTING_SETTINGS)
+
+class RefitHelper:
+    def __init__(
+        self,
+        feature_names,
+        estimator_class,
+        scoring,
+        estimator_params,
+        n_splits=DEFAULT_SPLITS,
+        n_repeats=DEFAULT_REPEATS,
+        random_seed=utils.DEFAULT_RANDOM_SEED,
+    ):
+        """
+        Args:
+            feature_names: A list of selected features.
+            estimator_class: The scikit-learn or Microsoft LightGBM \
+                tree-based estimator to use. The estimator can either be a \
+                classifier or a regressor.
+            scoring: The specification of a scoring function to use for \
+                model-evaluation, i.e., a function that can be used for \
+                assessing the prediction error of a trained model given a test \
+                set.
+            estimator_params: The estimator hyperparameters and corresponding \
+                values to search or directly use. If only a single value for \
+                each hyperparameter is provided then only cross-validation \
+                will be performed and no hyperparameter search will be \
+                performed. Defaults to None.
+            n_splits: The number of folds to generate in the outer loop \
+                of a nested cross-validation. Defaults to \
+                    :const:`shapfire.shapfire.DEFAULT_SPLITS`.
+            n_repeats: The number of new folds that should be generated \
+                in the outer loop of a nested cross-validation. Defaults to \
+                    :const:`shapfire.shapfire.DEFAULT_REPEATS`.
+            random_seed: The random seed to use for reproducibility purposes. \
+                Defaults to :const:`shapfire.utils.DEFAULT_RANDOM_SEED`.
+
+        Attributes:
+            history: A class attribute and pandas dataframe that contains the
+                performance score (and possibly other data) associated with each
+                test fold in a repeated corss-validation.
+        """
+        # Class vars corresponding to input args
+        self.estimator_class = estimator_class
+        self.scoring = scoring
+        self.estimator_params = estimator_params
+        self.n_splits = n_splits
+        self.n_repeats = n_repeats
+        self.feature_names = feature_names
+        self.random_seed = random_seed
+
+        # Check that the given input is valid
+        # self._check_vars()
+
+        # Set random seed for reproducibility purposes
+        np.random.seed(self.random_seed)
+
+        # Public accessible vars associated with the most important features
+        # These vars wil eventually be set after a call to 'fit()'
+        self.history = pd.DataFrame()
+
+    def fit(self, X, y):
+        history = []
+        repeat_number = 1
+
+        cv = get_kfold_cross_validator(
+            estimator_class=self.estimator_class,
+            n_repeats=self.n_repeats,
+            n_splits=self.n_splits,
+        )
+
+        for i, (train_ix, test_ix) in enumerate(cv.split(X=X, y=y)):
+            X_train, X_test = X.iloc[train_ix, :], X.iloc[test_ix, :]
+            y_train, y_test = y.values[train_ix], y.values[test_ix]
+
+            _X_train, _y_train = X_train[self.feature_names], y_train
+            estimator = self.estimator_class(
+                random_state=self.random_seed,
+                **self.estimator_params,
+            ).fit(
+                X=_X_train,
+                y=_y_train.ravel(),
+            )
+
+            score = self._get_score(
+                estimator=estimator,
+                X_test=X_test[self.feature_names],
+                y_test=y_test,
+            )
+
+            if score is None:
+                raise NotImplementedError(
+                    f"The scorer '{self.scoring}' has not yet been "
+                    + "implemented for use with ShapFire."
+                )
+            dict_ = {
+                # 'score' a dictionary that contains data pertaining to
+                # the estimate of the performance on the outer loop CV test
+                # set using a certain scoring measure specified by
+                # 'self.scoring'.
+                "score": score,
+                "repeat_number": repeat_number,
+            }
+            history.append(dict_)
+            if ((i + 1) % self.n_splits) == 0:
+                repeat_number += 1
+
+        _history = pd.DataFrame(data=history)
+        # If the current ShapFire object already has a 'self.history'
+        # defined then reset the dataframe so data does not accumulate
+        if self.history is not None:
+            self.history = pd.DataFrame()
+        self.history = pd.concat(
+            [
+                self.history.reset_index(drop=True),
+                _history.reset_index(drop=True),
+            ],
+            ignore_index=True,
+            join="outer",
+            axis=0,
+        )
+        return self
+
+    def _get_score(
+        self,
+        estimator,
+        X_test,
+        y_test,
+    ):
+        """
+        Retrieve the performance score of an estimator on a given test set.
+
+        Args:
+            estimator: A LightGBM estimator from Microsoft's LightGBM \
+                gradient boosting decision tree framework. The estimator can \
+                either be a classifier or a regressor. The estimator is \
+                assumed to have been trained on a training dataset and \
+                should be evaluated on a test dataset.
+            X_test: A test dataset.
+            y_test: The samples associated with the target variable of the \
+                test dataset.
+
+        Raises:
+            ValueError: If the estimator can not be identified as being a \
+                classifier or regressor.
+
+        Returns:
+            Returns a dictionary with a performance score and possibly \
+            additional data pertaining to a certain type of performance score.
+        """
+        dict_ = {}
+        if is_classifier(self.estimator_class):
+            # Handle special scoring functions where additional data, beyond
+            # just a score, needs to be saved and passed on
+            if self.scoring == "roc_auc":
+                fpr, tpr, roc_auc = get_roc_auc_statistics(
+                    estimator=estimator,
+                    X_test=X_test,
+                    y_test=y_test,
+                )
+                dict_["fpr"] = fpr
+                dict_["tpr"] = tpr
+                dict_["roc_auc"] = roc_auc
+
+                # Get confusion matrices
+                conf_matrices = get_conf_matrices(
+                    estimator=estimator,
+                    X_test=X_test,
+                    y_test=y_test,
+                )
+                dict_["conf_matrices"] = conf_matrices
+
+                return dict_
+            else:
+                raise ValueError("TODO: Not yet implemented!")
+        elif is_regressor(self.estimator_class):
+            raise ValueError("TODO: Not yet implemented!")
+        else:
+            raise ValueError(
+                "It could not be determined whether the given "
+                + f"'estimator': {estimator} is a classifier or a regressor."
+            )
+
+class HyperparameterSearchHelper:
     """
     A ShapFire helper class for performing cross-validation and hyperparameter
     tuning.
@@ -339,21 +2121,14 @@ class HyperparameterSearchHelper(BaseEstimator):
 
     def __init__(
         self,
-        cv: typing.Union[RepeatedStratifiedKFold, RepeatedKFold],
-        estimator_class: typing.Union[
-            lightgbm.LGBMClassifier,
-            lightgbm.LGBMRegressor,
-            sklearn.ensemble.RandomForestClassifier,
-            sklearn.ensemble.RandomForestRegressor,
-        ],
-        estimator_params: typing.Union[None, dict[str, typing.Any]],
-        scoring: str,
-        hyperparameter_search: typing.Union[
-            None, GridSearchCV, RandomizedSearchCV
-        ] = None,
-        n_jobs: typing.Union[None, int] = -1,
-        random_seed: int = utils.DEFAULT_RANDOM_SEED,
-    ) -> None:
+        cv,
+        estimator_class,
+        estimator_params,
+        scoring,
+        hyperparameter_search=None,
+        n_jobs=None,
+        random_seed=utils.DEFAULT_RANDOM_SEED,
+    ):
         """
         A helper class to perform cross-validation and hyperparameter tuning,
         given (i) a valid way of generating cross-validation trin/test folds and
@@ -392,20 +2167,17 @@ class HyperparameterSearchHelper(BaseEstimator):
         self.n_jobs = n_jobs
         self.random_seed = random_seed
 
-        # Check that the given input is valid
-        self._check_vars()
-
         # Publically accessible variables associated with the model that
         # obtained the best performance score. These variables wil eventually be
         # set after a call to 'fit()'
-        self.best_score_: typing.Union[None, float] = None
-        self.best_params_: typing.Union[None, dict[str, typing.Any]] = None
+        self.best_score = None
+        self.best_params = None
 
     def fit(
         self,
-        X: typing.Union[numpy.ndarray, pandas.DataFrame],
-        y: typing.Union[numpy.ndarray, pandas.Series],
-    ) -> "HyperparameterSearchHelper":
+        X,
+        y,
+    ):
         """
         Perform cross-validation and hyperparameter tuning given an input
         dataset. In case a single hyperparameter configuration is given as input
@@ -448,8 +2220,8 @@ class HyperparameterSearchHelper(BaseEstimator):
                 y=y,
                 **args,
             )
-            means = numpy.mean(cv_scores)
-            stds = numpy.std(cv_scores, ddof=1)
+            means = np.mean(cv_scores)
+            stds = np.std(cv_scores, ddof=1)
             params = self.estimator_params
             self.best_score_ = means
             self.best_params_ = self.estimator_params
@@ -505,36 +2277,75 @@ class HyperparameterSearchHelper(BaseEstimator):
             )
         return self
 
-    def _check_vars(self) -> None:
-        _check_estimator_class(estimator_class=self.estimator_class)
-        _check_scoring_function(
-            scoring=self.scoring, estimator_class=self.estimator_class
+
+def get_conf_matrices(estimator, X_test, y_test, n_points=20):
+    # TP = confusion[1, 1] is true positives
+    # TN = confusion[0, 0] is true negatives
+    # FP = confusion[0, 1] is false positives
+    # FN = confusion[1, 0] is false negatives
+    increment = 1 / n_points
+    thresholds = [i * increment for i in range(n_points + 1)]
+    results = []
+    for probability in thresholds:
+        y_pred = (estimator.predict_proba(X_test)[:, 1] >= probability).astype(
+            bool
         )
-        _check_hyperparameter_search_params(
-            hyperparameter_search=self.hyperparameter_search
+        conf_matrix = confusion_matrix(y_test.astype(bool), y_pred)
+        total = np.sum(np.sum(conf_matrix))
+        accuracy = (conf_matrix[0, 0] + conf_matrix[1, 1]) / total
+        specificity = conf_matrix[0, 0] / (
+            conf_matrix[0, 0] + conf_matrix[0, 1]
         )
+        sensitivity = conf_matrix[1, 1] / (
+            conf_matrix[1, 0] + conf_matrix[1, 1]
+        )
+        youden_index = sensitivity + specificity - 1
+        results.append(
+            {
+                "true_positives": conf_matrix[1, 1],
+                "true_negatives": conf_matrix[0, 0],
+                "false_positives": conf_matrix[0, 1],
+                "false_negatives": conf_matrix[1, 0],
+                "accuracy": accuracy,
+                "probability": probability,
+                "specitivity": specificity,
+                "sensitivity": sensitivity,
+                "youden_index": youden_index,
+            }
+        )
+    return results
+
+
+def _check_hyperparameter_search_params(
+    hyperparameter_search,
+):
+    if hyperparameter_search is not None:
+        if (
+            hyperparameter_search != GridSearchCV
+            and hyperparameter_search != RandomizedSearchCV
+        ):
+            raise ValueError(
+                "The given input argument 'hyperparameter_search': "
+                + f"'{hyperparameter_search}' is not a valid "
+                + "option. Valid input values are: "
+                + ", ".join(HYPERPARAMETER_SEARCH_METHODS)
+                + "."
+            )
 
 
 def hyperparameter_search_helper(
-    X: typing.Union[numpy.ndarray, pandas.DataFrame],
-    y: typing.Union[numpy.ndarray, pandas.Series],
-    feature_names: list[str],
-    estimator_class: typing.Union[
-        lightgbm.LGBMClassifier,
-        lightgbm.LGBMRegressor,
-        sklearn.ensemble.RandomForestClassifier,
-        sklearn.ensemble.RandomForestRegressor,
-    ],
-    estimator_params: typing.Union[None, dict[str, typing.Any]],
-    scoring: str,
-    n_splits: int,
-    n_repeats: int,
-    hyperparameter_search: typing.Union[
-        None, GridSearchCV, RandomizedSearchCV
-    ] = None,
-    n_jobs: typing.Union[None, int] = -1,
-    random_seed: int = utils.DEFAULT_RANDOM_SEED,
-) -> tuple[float, dict[str, typing.Any]]:
+    X,
+    y,
+    feature_names,
+    estimator_class,
+    estimator_params,
+    scoring,
+    n_splits,
+    n_repeats,
+    hyperparameter_search=None,
+    n_jobs=None,
+    random_seed=utils.DEFAULT_RANDOM_SEED,
+):
     """
     A helper method that does hyperparameter tuning and cross-validation using a
     set of selected features. The method returns the best CV performace estimate
@@ -593,1065 +2404,3 @@ def hyperparameter_search_helper(
     best_score_ = hyperparameter_search_helper.best_score_
     best_params_ = hyperparameter_search_helper.best_params_
     return best_score_, best_params_  # type: ignore
-
-
-# TODO: Refactor into class 'AutoHierarchicalAssociationClustering' in file
-# shapfire.clutering.py
-class FeatureSelectionHelper:
-    """A ShapFire helper class for organizing data related to feature clusters
-    and feature subsets."""
-
-    def __init__(
-        self,
-        random_seed: int = utils.DEFAULT_RANDOM_SEED,
-    ) -> None:
-        """
-        Initialize a FeatureSelectionHelper object.
-
-        Args:
-            random_seed: The random seed to use for \
-                reproducibility purposes. Defaults to \
-                :const:`shapfire.utils.DEFAULT_RANDOM_SEED`.
-        """
-        # Internal variables for easy access to data
-        self._cluster_labels_df: typing.Union[None, pandas.DataFrame] = None
-
-    @property
-    def nclusters(self) -> int:
-        if self._cluster_labels_df is not None:
-            return numpy.unique(
-                self._cluster_labels_df["cluster_label"].values
-            ).shape[0]
-        else:
-            # TODO: No clustering has been executed
-            raise ValueError("TODO")
-
-    @property
-    def largest_cluster(self) -> int:
-        cluster_size_max = 0
-        if self._cluster_labels_df is not None:
-            for _, df in self._cluster_labels_df.groupby("cluster_label"):
-                cluster_size = df.shape[0]
-                if cluster_size > cluster_size_max:
-                    cluster_size_max = cluster_size
-            return cluster_size_max
-        else:
-            raise ValueError("TODO")
-
-    @property
-    def feature_clusters(self) -> list[str]:
-        if self._cluster_labels_df is not None:
-            feature_clusters: list[str] = []
-            for _, df in self._cluster_labels_df.groupby("cluster_label"):
-                feature_clusters.append(df["feature_name"].to_list())
-            return feature_clusters
-        else:
-            raise ValueError("TODO")
-
-    def _identify_clusters(
-        self,
-        X: typing.Union[numpy.ndarray, pandas.DataFrame],
-    ) -> tuple[pandas.DataFrame, AutoHierarchicalAssociationClustering]:
-        """
-        Given a dataset containing features (columns) and corresponding \
-        observations (rows) identify highly associated/correlated features by \
-        grouping these into clusters.
-
-        Args:
-            X: An input dataset containing features (columns) and \
-                corresponding observations (rows).
-
-        Raises:
-            ValueError: If the given input argument 'X' is not type \
-                'ndarray' or 'DataFrame'.
-
-        Returns:
-            Data pertaining to the best clustering of features.
-        """
-        if isinstance(X, numpy.ndarray):
-            logging.info("Converting input 'ndarray' 'X' to a 'DataFrame'.")
-            _X = pandas.DataFrame(X)
-        elif isinstance(X, pandas.DataFrame):
-            _X = X.copy()
-        else:
-            raise TypeError(
-                "The given input argument 'X' is not of type "
-                + "'ndarray' or 'DataFrame'. 'X' is instead "
-                + f"of type {type(X)}."
-            )
-        # TODO: Drop a feature (dataframe column) if more than 1/3
-        #       percent of the values in the column are missing
-        # TODO: Replace NAN values in a column with the mean of
-        #       of the values of the feature (dataframe column)
-        _X = _X.dropna(axis=0)
-        (cluster_labels_df, clustering_model,) = _identify_colinear_features(
-            df=_X,
-        )
-        self._cluster_labels_df = cluster_labels_df
-        return (
-            cluster_labels_df,
-            clustering_model,
-        )
-
-
-class RankedDifferences:
-    def __init__(
-        self,
-        reference: str = "mean",
-        ascending: bool = True,
-    ) -> None:
-        """
-        _summary_
-
-        Args:
-            reference: The data fusion method to use for producing a reference
-                vector. Defaults to "mean".
-            ascending: The order in which values are ranked. Defaults to True.
-        """
-        self.reference = reference
-        self.ascending = ascending
-
-        # Check that the given input is valid
-        self._check_vars()
-
-    def fit(self, X: pandas.DataFrame, y: None = None) -> pandas.DataFrame:
-        return self.ranked_differences(
-            df=X,
-            ascending=self.ascending,
-        )
-
-    def ranked_differences(
-        self,
-        df: pandas.DataFrame,
-        ascending: bool = True,
-        ties: str = "average",
-    ) -> pandas.DataFrame:
-        # Produce a reference vector using a data fusion method over the rows
-        # of a panads dataframe
-        ref_vector = self.calculcate_reference(df=df)
-        # Rank the data in the reference vector (a pandas series)
-        ref_vector_ranked = ref_vector.rank(
-            method=ties, ascending=ascending, axis=0
-        )
-
-        # Rank the data in each row of the input dataframe over the columns
-        df_ranked = df.rank(method=ties, ascending=ascending, axis=1)
-
-        # Calculate the row-wise difference between the ranked rows in the input
-        # dataframe 'df' and the generated (ranked) reference vector
-        diffs = df_ranked.subtract(ref_vector_ranked, axis=1)
-
-        # Return the mean absolute distance to the (ranked) reference vector
-        return diffs.abs().mean()
-
-    def calculcate_reference(self, df: pandas.DataFrame) -> pandas.Series:
-        """Produce a reference vector with a data fusion method over the
-        rows."""
-        if self.reference == "min":
-            reference_vector = df.min(axis=0)
-        elif self.reference == "max":
-            reference_vector = df.max(axis=0)
-        elif self.reference == "mean":
-            reference_vector = df.mean(axis=0)
-        elif self.reference == "median":
-            reference_vector = df.median(axis=0)
-        return reference_vector  # type: ignore
-
-    def _check_vars(self) -> None:
-        self.reference = self.reference.lower().strip()
-        _check_reference_vector_params(reference=self.reference)
-
-
-class ShapFire(BaseEstimator, TransformerMixin):
-    _HISTORY_REQUIRED_FIELDS = [
-        "score",
-        "feature_importances",
-        # Data pertaining to the following fields are not needed anywhere but
-        # returned for the sake of convenience in case a user needs the data...
-        "shap_values",
-    ]
-
-    def __init__(
-        self,
-        estimator_class: typing.Union[
-            lightgbm.LGBMClassifier,
-            lightgbm.LGBMRegressor,
-            sklearn.ensemble.RandomForestClassifier,
-            sklearn.ensemble.RandomForestRegressor,
-        ],
-        scoring: str,
-        estimator_params: typing.Union[None, dict[str, typing.Any]] = None,
-        n_splits: int = DEFAULT_SPLITS,
-        n_repeats: int = DEFAULT_REPEATS,
-        random_seed: int = utils.DEFAULT_RANDOM_SEED,
-        iterations: typing.Union[None, int] = None,
-        reference: str = "mean",
-        n_samples: int = 1000,
-        n_batches: int = 250,
-    ) -> None:
-        """
-        The main class used for applying SHAP feature importance rank ensembling
-        for feature selection.
-
-        Args:
-            estimator_class: The scikit-learn or Microsoft LightGBM \
-                tree-based estimator to use. The estimator can either be a \
-                classifier or a regressor.
-            scoring: The specification of a scoring function to use for \
-                model-evaluation, i.e., a function that can be used for \
-                assessing the prediction error of a trained model given a test \
-                set.
-            estimator_params: The estimator hyperparameters and corresponding \
-                values to search or directly use. If only a single value for \
-                each hyperparameter is provided then only cross-validation \
-                will be performed and no hyperparameter search will be \
-                performed. Defaults to None.
-            n_splits: The number of folds to generate in the outer loop \
-                of a nested cross-validation. Defaults to \
-                    :const:`shapfire.shapfire.DEFAULT_SPLITS`.
-            n_repeats: The number of new folds that should be generated \
-                in the outer loop of a nested cross-validation. Defaults to \
-                    :const:`shapfire.shapfire.DEFAULT_REPEATS`.
-            random_seed: The random seed to use for reproducibility purposes. \
-                Defaults to :const:`shapfire.utils.DEFAULT_RANDOM_SEED`.
-            iterations: The number of feature subsets to sample and subsequently
-                use for model-training such that SHAP feature importance values
-                can be extracted. Defaults to None which in turns sets the
-                number of iterations to the size of the largest cluster of
-                highly associated features found.
-            reference: The data fusion method to use for producing a reference
-                vector. Defaults to "mean".
-            n_samples: The number of random samples of rank permutations to use
-                in a batch. Several batches of random samples are used to
-                estimate a "ranking distribution" which in turn is used to
-                determine a feature importance cut-off threshold. Defaults to
-                1000.
-            n_batches: The number of batches of random samples that should be
-                used to estimate a "ranking distribution" which in turn is used
-                to determine a feature importance cut-off threshold. Defaults to
-                250.
-
-        Attributes:
-            ranked_differences: A class attribute and pandas dataframe that
-                specifies the final importance values associated with each
-                of the features in the given input dataset.
-            selected_features: A ShapFire class attribute and list that
-                specifies the final feature subset selected by ShapFire and
-                which is expected to achieve the best possible model
-                performance.
-        """
-        # Class vars corresponding to input args
-        self.estimator_class = estimator_class
-        self.scoring = scoring
-        self.estimator_params = estimator_params
-        self.n_splits = n_splits
-        self.n_repeats = n_repeats
-        self.iterations = iterations
-        self.random_seed = random_seed
-        self.reference = reference
-        self.n_samples = n_samples
-        self.n_batches = n_batches
-
-        # Check that the given input is valid
-        self._check_vars()
-
-        # Set random seed for reproducibility purposes
-        numpy.random.seed(self.random_seed)
-
-        # Public accessible vars associated with the most important features
-        # These vars wil eventually be set after a call to 'fit()'
-        self.ranked_differences: typing.Union[None, pandas.DataFrame] = None
-        self.selected_features: typing.Union[None, list[str]] = None
-
-        # Internal vars for easy access to data associated with the importance
-        # ranking of features
-        self._history: pandas.DataFrame = pandas.DataFrame()
-        self._feature_selector: typing.Union[
-            None, FeatureSelectionHelper
-        ] = None
-        # Private class variable for a progress bar that is to be updated
-        # TODO: Determine progrss bar type
-        self._progress_bar: typing.Union[None, typing.Any] = None
-
-        # Keep a class variable around to store a plotting interface object
-        # such that all necessary plotting methods can be accessed through it
-        self._plotting_interface: typing.Union[
-            None, ShapFirePlottingInterface
-        ] = None
-
-    def fit(
-        self,
-        X: typing.Union[numpy.ndarray, pandas.DataFrame],
-        y: typing.Union[numpy.ndarray, pandas.DataFrame],
-    ) -> "ShapFire":
-        """
-        Perform SHAP feature importance rank ensembling for the purpose of
-        ranking and selecting the features that can be said to be the most
-        important for a certain prediction task at hand.
-
-        Args:
-            X: An input dataset that the ShapFire method should be applied to. \
-                The dataset is assumed to contain features (columns) and \
-                corresponding observations (rows).
-            y: The samples associated with the target variable of the dataset.
-
-        Returns:
-            A ShapFire object containing the necessary data associated with \
-                the most important features of the given input dataset.
-        """
-        if isinstance(X, numpy.ndarray):
-            logging.info("Converting input 'ndarray' 'X' to a 'DataFrame'.")
-            columns = [f"{i}" for i in range(X.shape[1])]
-            X = pandas.DataFrame(data=X, columns=columns)
-        elif isinstance(X, pandas.DataFrame):
-            # Make sure the column names are strings!
-            X.columns = [str(name) for name in X.columns]
-        else:
-            raise TypeError(
-                "The given input argument 'X' is not of type "
-                + "'ndarray' or 'DataFrame'. 'X' is instead "
-                + f"of type {type(X)}."
-            )
-        if isinstance(y, numpy.ndarray):
-            logging.info("Converting input 'ndarray' 'y' to a 'Series'.")
-            y = pandas.Series(y)
-        elif isinstance(y, pandas.Series):
-            pass
-        else:
-            raise TypeError(
-                "The given input argument 'X' is not of type "
-                + "'ndarray' or 'Series'. 'X' is instead "
-                + f"of type {type(X)}."
-            )
-
-        # Determine feature clustering
-        self._feature_selector = FeatureSelectionHelper(
-            random_seed=self.random_seed,
-        )
-        (
-            cluster_labels_df,
-            clustering_model,
-        ) = self._feature_selector._identify_clusters(X=X)
-
-        if self.iterations is None:
-            self.iterations = self._feature_selector.largest_cluster
-
-        # Create progress bar which will be updated continuously to track the
-        # progress of the outer cross-validation loop
-        total = self.n_repeats * self.n_splits * self.iterations
-        self._progress_bar = tqdm(
-            total=total,
-            unit_scale=True,
-            ascii=" >=",
-            bar_format="{desc:<20}{percentage:3.0f}%|{bar:25}{r_bar}",
-            desc="ShapFire progress",
-        )
-
-        # Perform repeated nested Cross-Validation (CV):
-        self._outer_cv_loop(X=X, y=y)
-
-        # Close/stop the progress bar
-        self._progress_bar.close()
-
-        # Calculate normalized SHAP feature importance scores and pick the best
-        # feature from each of the previously found clusters
-        df = self._calculate_normalized_shap_feature_importance()
-
-        # Extract and organize data associated with each tested feature subset
-        data_dict = self._reorganize_feature_importance_values(df=df)
-
-        ndf = self._calculate_ranked_differences(data_dict=data_dict)
-        self._discard_unimportant_feautres(df=ndf)
-        return self
-
-    def transform(
-        self, X: typing.Union[numpy.ndarray, pandas.DataFrame]
-    ) -> typing.Union[numpy.ndarray, pandas.DataFrame]:
-        """
-        Reduce the input dataset X containing features (columns) and
-        corresponding observations (rows), to only the columns of features
-        selected by ShapFire.
-
-        Args:
-            X: The original input dataset that the ShapFire method was applied \
-                to. The dataset is assumed to contain features (columns) and \
-                corresponding observations (rows).
-
-        Raises:
-            ValueError: If the :meth:`fit` method has not yet been called.
-
-        Returns:
-            A reduced dataset that only contains the most important features \
-                (columns).
-        """
-        if self.selected_features is not None:
-            return X[self.selected_features]
-        else:
-            raise ValueError(
-                "Method '.fit(X, y)' has not yet been called. "
-                + "Simply call method '.fit_transform(X, y)' or call "
-                + "'.fit(X, y)' before calling '.transform(X)'."
-            )
-
-    def fit_transform(
-        self,
-        X: typing.Union[numpy.ndarray, pandas.DataFrame],
-        y: typing.Union[numpy.ndarray, pandas.DataFrame],
-    ) -> typing.Union[numpy.ndarray, pandas.DataFrame]:
-        """
-        Perform SHAP feature importance rank ensembling for the purpose of
-        selecting the features that are the most important. Subsequently, reduce
-        the input dataset 'X' to only the columns of the selected features.
-
-        Args:
-            X: An input dataset that the ShapFire method should be applied to. \
-                The dataset is assumed to contain features (columns) and \
-                corresponding observations (rows).
-            y: The samples associated with the target variable of the dataset.
-
-        Returns:
-            A reduced dataset that only contains the data associated with the \
-                most important features.
-        """
-        self.fit(X=X, y=y)
-        return self.transform(X=X)
-
-    def plot_ranking(
-        self,
-        groupby: str = "cluster",
-        rcParams: typing.Union[None, dict[str, str]] = None,
-        figsize: typing.Union[None, tuple[float, float]] = None,
-        fontsize: int = 10,
-        with_text: bool = True,
-        with_overlay: bool = True,
-        ax: typing.Union[None, Axes] = None,
-    ) -> tuple[Figure, Axes]:
-        """
-        Plot the feature importance scores associated with each feature. The
-        features will be ordered in the figure from best to worst and possibly
-        according to which cluster they each belong to.
-
-        Args:
-            groupby: A string value indicating how the feature importance \
-                ranking should be displayed in a figure. If the option \
-                'cluster' is chosen, then the features are grouped and \
-                shown in the figure based on their assigned cluster and \
-                according to the importance rank of the best feautre in the \
-                cluster. If 'feature' is chosen, then the features are \
-                shown in the figure purely according to their global rank \
-                without any consideration to what cluster each features are a \
-                part of.
-            figsize: The width and height of the figure in inches. Defaults to \
-                None.
-            fontsize: The size of the font present in the figure. Defaults to \
-                10.
-            with_text: If input argument :code:`groupby` is set to \
-                'cluster', then :code:`with_text` determines whether \
-                features that have been grouped in the figure by the cluster \
-                they each belong to, should also be annotated with a text \
-                label. Defaults to True.
-            with_overlay: Depending on whether :code:`groupby` is set to \
-                'cluster' or 'feature', groups of features or individual \
-                features are assigned a gray-scale overlay creating a visual \
-                grouping / delimitation of features. Defaults to True.
-            ax: A Matplotlib Axes object. Defaults to None.
-
-        Returns:
-            A Matplotlib Figure and Axes object.
-        """
-        if self._plotting_interface is None:
-            self._plotting_interface = ShapFirePlottingInterface(shapfire=self)
-            # TODO: If fit is called again, then self._plotting_interface should
-            #       be set to None.
-        return self._plotting_interface.plot_ranking(
-            groupby=groupby,
-            rcParams=rcParams,
-            figsize=figsize,
-            fontsize=fontsize,
-            with_text=with_text,
-            with_overlay=with_overlay,
-            ax=ax,
-        )
-
-    def _check_vars(self) -> None:
-        _check_scoring_function(
-            scoring=self.scoring, estimator_class=self.estimator_class
-        )
-        if isinstance(self.scoring, str):
-            self.scoring = self.scoring.strip().lower()
-        _check_cv_params(n_splits=self.n_splits, n_repeats=self.n_repeats)
-        if self.iterations is not None:
-            if self.iterations < 1:
-                raise ValueError(
-                    "The given input argument 'iterations' can not be"
-                    "less than 1."
-                )
-
-    # TODO: Make public and not part of class
-    def _get_score(
-        self,
-        estimator: typing.Union[
-            lightgbm.LGBMClassifier,
-            lightgbm.LGBMRegressor,
-            sklearn.ensemble.RandomForestClassifier,
-            sklearn.ensemble.RandomForestRegressor,
-        ],
-        X_test: pandas.DataFrame,
-        y_test: pandas.Series,
-    ) -> typing.Union[None, dict[str, typing.Any]]:
-        """
-        Retrieve the performance score of an estimator on a given test set.
-
-        Args:
-            estimator: A LightGBM estimator from Microsoft's LightGBM \
-                gradient boosting decision tree framework. The estimator can \
-                either be a classifier or a regressor. The estimator is \
-                assumed to have been trained on a training dataset and \
-                should be evaluated on a test dataset.
-            X_test: A test dataset.
-            y_test: The samples associated with the target variable of the \
-                test dataset.
-
-        Raises:
-            ValueError: If the estimator can not be identified as being a \
-                classifier or regressor.
-
-        Returns:
-            Returns a dictionary with a performance score and possibly \
-            additional data pertaining to a certain type of performance score.
-        """
-        dict_ = {}
-        if is_classifier(self.estimator_class):
-            # Handle special scoring functions where additional data, beyond
-            # just a score,  needs to be saved and passed on
-            if self.scoring == "roc_auc":
-                fpr, tpr, roc_auc = get_roc_auc_statistics(
-                    estimator=estimator,
-                    X_test=X_test,
-                    y_test=y_test,
-                )
-                dict_["fpr"] = fpr
-                dict_["tpr"] = tpr
-                dict_["roc_auc"] = roc_auc
-                return dict_
-            else:
-                raise ValueError("TODO: Not yet implemented!")
-        elif is_regressor(self.estimator_class):
-            raise ValueError("TODO: Not yet implemented!")
-        else:
-            raise ValueError(
-                "It could not be determined whether the given "
-                + f"'estimator': {estimator} is a classifier or a regressor."
-            )
-
-    def _outer_cv_loop(
-        self,
-        X: pandas.DataFrame,
-        y: pandas.Series,
-    ) -> None:
-        """
-        Given a dataset perform repeated cross-validation to estimate SHAP
-        values and thus the importance of the different features that are
-        contained in the input dataset.
-
-        Args:
-            X: The original input dataset that the ShapFire method is applied \
-                to. The dataset is assumed to contain features (columns) and \
-                corresponding observations (rows).
-            y: The original set of samples associated with the target variable \
-                of the dataset.
-            cv: A scikit-learn cross-validator class for generating train/test \
-                folds.
-
-        Raises:
-            NotImplementedError: If a not yet implemented scoring function is \
-                passed as an argument.
-        """
-        history = []
-        repeat_number = 1
-
-        cv = get_kfold_cross_validator(
-            estimator_class=self.estimator_class,
-            n_repeats=self.n_repeats,
-            n_splits=self.n_splits,
-        )
-        feature_clusters = list(
-            self._feature_selector.feature_clusters  # type: ignore
-        )
-        cs = ClusterSampler(feature_clusters=feature_clusters)
-
-        for _ in range(self.iterations):  # type: ignore
-            selected_features = cs.sample_feature_subset()
-            for i, (train_ix, test_ix) in enumerate(cv.split(X=X, y=y)):
-                X_train, X_test = X.iloc[train_ix, :], X.iloc[test_ix, :]
-                y_train, y_test = y.values[train_ix], y.values[test_ix]
-
-                _X_train, _y_train = X_train[selected_features], y_train
-                estimator = self.estimator_class(
-                    random_state=self.random_seed,
-                ).fit(
-                    X=_X_train,
-                    y=_y_train.ravel(),
-                )
-
-                # Retrieve SHAP values on outer loop CV test set using
-                # best estimator refitted on inner loop CV training + test set
-                shap_values = shap.TreeExplainer(estimator).shap_values(
-                    X_test[selected_features]
-                )
-                # TODO: Make sure shap_values[1] can actually be accessed!
-                #       else raise error!
-                values = numpy.abs(shap_values[1]).mean(axis=0)
-                feature_importances = pandas.DataFrame(
-                    list(zip(selected_features, values)),
-                    columns=["feature_name", "feature_importance"],
-                )
-                feature_importances.sort_values(
-                    by=["feature_importance"],
-                    ascending=False,
-                    inplace=True,
-                )
-                score: typing.Union[
-                    None, dict[str, typing.Any]
-                ] = self._get_score(
-                    estimator=estimator,
-                    X_test=X_test[selected_features],
-                    y_test=y_test,
-                )
-
-                if score is None:
-                    raise NotImplementedError(
-                        f"The scorer '{self.scoring}' has not yet been "
-                        + "implemented for use with ShapFire."
-                    )
-                dict_ = {
-                    # 'score' a dictionary that contains data pertaining to
-                    # the estimate of the performance on the outer loop CV test
-                    # set using a certain scoring measure specified by
-                    # 'self.scoring'.
-                    "score": score,
-                    # 'feature_importance' is dataframe that contains feature
-                    # names and corresponding importance values for each feature
-                    # selected in the inner CV loop.
-                    "feature_importances": feature_importances,
-                    # 'shap_values' contains the raw numpy array output from the
-                    # SHAP Python library.
-                    "shap_values": shap_values,
-                    "repeat_number": repeat_number,
-                }
-                history.append(dict_)
-                if ((i + 1) % self.n_splits) == 0:
-                    repeat_number += 1
-
-                # Update the progress bar
-                self._progress_bar.update(1)  # type: ignore
-
-        _history = pandas.DataFrame(data=history)
-        # If the current ShapFire object already has a 'self._history'
-        # defined then reset the dataframe so data does not accumulate
-        if self._history is not None:
-            self._history = pandas.DataFrame()
-        self._history = pandas.concat(
-            [
-                self._history.reset_index(drop=True),
-                _history.reset_index(drop=True),
-            ],
-            ignore_index=True,
-            join="outer",
-            axis=0,
-        )
-
-    def _calculate_normalized_shap_feature_importance(self) -> pandas.DataFrame:
-        """
-        Calculate and organize the normalized SHAP feature importance each test
-        fold in the cross-validation loop. Normalizing SHAP feature importance
-        scores makes it possible to compare and aggregate results across
-        different folds if necessary.
-
-        Raises:
-            ValueError: If the internal class variable  '._history' is None.
-            ValueError: If the internal class variable '._feature_selector' \
-                is None.
-            ValueError: If the internal class variable \
-                '._feature_selector._df_cluster_labels' is None.
-            ValueError: If a certain column name is not contained in the \
-                internally used '._history' pandas dataframe.
-
-        Returns:
-            A pandas dataframe that contains normalized SHAP feature importance
-            values associated with each feature in a tested feature subset.
-        """
-        # Validate and check necessary data before proceeding
-        if self._history is None:
-            raise ValueError(
-                "Internal error. The internal class variable "
-                + "'._history' is None. This should not happend if "
-                + "the method is called via the '.fit(X, y)' method."
-            )
-        if self._feature_selector is None:
-            raise ValueError(
-                "Internal error. The internal class variable "
-                + "'._feature_selector' is None. This should not happend if "
-                + "the method is called via the '.fit(X, y)' method."
-            )
-        if self._feature_selector._cluster_labels_df is None:
-            raise ValueError(
-                "Internal error. The internal class variable "
-                + "'._feature_selector._df_cluster_labels ' is None. This "
-                + "should not happend if the method is called via the "
-                + "'.fit(X, y)' method."
-            )
-
-        # Verify that all required data is contained in 'self._history'
-        for column_name in self._HISTORY_REQUIRED_FIELDS:
-            if column_name not in self._history.columns:
-                raise ValueError(
-                    f"The column name {column_name} is required but is "
-                    + "not contained in the internally used "
-                    + "'._history' pandas dataframe."
-                )
-        folds: int = self._history.shape[0]
-        arr = []
-        for i in range(folds):
-            df_fold = (
-                self._history["feature_importances"]
-                .iloc[i]
-                .reset_index(drop=True)
-            )
-            score: float = self._history["score"].iloc[i][self.scoring]
-
-            # Sum feature importance value such that we can compute a
-            # normalized feature importance value that lies in the range
-            # [0, 1]. This makes it possible to then aggregate and compare
-            # scores across differrent trained models.
-            total = df_fold["feature_importance"].sum()
-
-            # Create new column with normalized feature importance scores
-            df_fold["normalized_feature_importance"] = (
-                df_fold["feature_importance"] / total
-            )
-
-            # Enumerate CV folds from 1...
-            df_fold.index = df_fold.index + 1
-            for index, row in df_fold.iterrows():
-                d = {
-                    "test_fold": i + 1,
-                    # Set the feature name
-                    "feature_name": row["feature_name"],
-                    # Set the normalized feature importance score calculated
-                    # based on the outer loop CV test fold
-                    "normalized_feature_importance": row[
-                        "normalized_feature_importance"
-                    ],
-                    # Set the rank of the feature. The rank is based on the
-                    # computed 'normalized_feature_importance'
-                    "feature_rank": index,
-                    # Set the performance score that was calculated based on
-                    # the outer loop CV test fold
-                    "score": score,
-                    # Retrieve the cluster that the feature belongs to
-                    "cluster": self._feature_selector._cluster_labels_df[
-                        self._feature_selector._cluster_labels_df[
-                            "feature_name"
-                        ]
-                        == row["feature_name"]
-                    ]["cluster_label"].iat[0],
-                }
-                arr.append(d)
-        return pandas.DataFrame(data=arr)
-
-    def _reorganize_feature_importance_values(
-        self, df: pandas.DataFrame
-    ) -> dict[str, pandas.DataFrame]:
-        # Organize data per tested feature subset
-        fsc = FeatureSubsetCollection()
-        for _, _df in df.groupby("test_fold"):
-            reduced_df = _df[
-                [
-                    "test_fold",
-                    "feature_name",
-                    "normalized_feature_importance",
-                ]
-            ]
-            pivot_df = reduced_df.pivot(
-                index=["test_fold"],
-                columns=["feature_name"],
-                values=["normalized_feature_importance"],
-            )
-            pivot_df = pivot_df["normalized_feature_importance"].reset_index(
-                drop=True
-            )
-            pivot_df.columns.name = None
-            names = list(pivot_df.columns)
-            feature_names = sorted(names)
-            key = "-".join(feature_names)
-            fsc._add_entries(key, pivot_df)
-        return fsc._data_dict
-
-    def _calculate_ranked_differences(
-        self, data_dict: dict[str, pandas.DataFrame]
-    ) -> pandas.DataFrame:
-        # For each evaluated subset of features calculate the ranked differences
-        # between rankings obtained from SHAP values associated with the feature
-        # subsets and reference vectors produced based on the same data through
-        # a data fusion method
-        evaluated_feature_subsets = []
-        for key in data_dict:
-            feature_importance_values = data_dict[key]
-            if feature_importance_values is not None:
-                ranked_differences = RankedDifferences(
-                    reference=self.reference, ascending=False
-                ).fit(feature_importance_values)
-                ranked_differences = ranked_differences.to_dict()
-                ranked_differences[
-                    "nsamples"
-                ] = feature_importance_values.shape[0]
-                evaluated_feature_subsets.append(ranked_differences)
-        df = pandas.DataFrame(data=evaluated_feature_subsets)
-        nsamples = df["nsamples"]
-        ndf = df.drop("nsamples", axis=1)
-        # Calculate weighted averages
-        ndf = ndf.multiply(nsamples, axis="rows").sum() / numpy.sum(nsamples)
-        ndf = ndf.sort_values(ascending=True).to_frame("ranked_difference")
-        return ndf
-
-    def _discard_unimportant_feautres(self, df: pandas.DataFrame) -> None:
-        # Determine a feature importance cut-off threshold
-        self.threshold_finder = utils.ThresholdFinder(
-            random_seed=self.random_seed,
-            ncols=self._feature_selector.nclusters,  # type: ignore
-            n_batches=self.n_batches,
-            n_samples=self.n_samples,
-        )
-        self.threshold_finder.fit()
-
-        cluster_labels = []
-        for index, _ in df.iterrows():
-            cluster_label = self._loopkup_cluster_label(feature_name=index)
-            cluster_labels.append(cluster_label)
-        df["cluster_label"] = cluster_labels
-        self.ranked_differences = df
-
-        selected_features = df[
-            df["ranked_difference"] <= self.threshold_finder.lower_threshold
-        ]
-        self.selected_features = selected_features.index.to_list()
-
-    def _loopkup_cluster_label(self, feature_name: str) -> str:
-        # Retrieve the cluster that the given input feature 'feature_name'
-        # belongs to
-        df = self._feature_selector._cluster_labels_df  # type: ignore
-        return df[  # type: ignore
-            df["feature_name"] == feature_name  # type: ignore
-        ]["cluster_label"].iat[0]
-
-
-class FeatureSubsetCollection:
-    def __init__(self) -> None:
-        self.feature_subsets: list = []
-        self._data_dict: dict[str, pandas.DataFrame] = {}
-
-    def _add_entries(self, key: str, data: pandas.DataFrame) -> None:
-        if key in self._data_dict:
-            self._data_dict[key] = pandas.concat(
-                [
-                    self._data_dict[key].reset_index(drop=True),
-                    data.reset_index(drop=True),
-                ],
-                ignore_index=True,
-                join="outer",
-                axis=0,
-            )
-        else:
-            self._data_dict[key] = data
-
-
-class RefitHelper:
-    def __init__(
-        self,
-        feature_names: list[str],
-        estimator_class: typing.Union[
-            lightgbm.LGBMClassifier,
-            lightgbm.LGBMRegressor,
-            sklearn.ensemble.RandomForestClassifier,
-            sklearn.ensemble.RandomForestRegressor,
-        ],
-        scoring: str,
-        estimator_params: typing.Union[None, dict[str, typing.Any]],
-        n_splits: int = DEFAULT_SPLITS,
-        n_repeats: int = DEFAULT_REPEATS,
-        random_seed: int = utils.DEFAULT_RANDOM_SEED,
-    ) -> None:
-        """
-        Args:
-            feature_names: A list of selected features.
-            estimator_class: The scikit-learn or Microsoft LightGBM \
-                tree-based estimator to use. The estimator can either be a \
-                classifier or a regressor.
-            scoring: The specification of a scoring function to use for \
-                model-evaluation, i.e., a function that can be used for \
-                assessing the prediction error of a trained model given a test \
-                set.
-            estimator_params: The estimator hyperparameters and corresponding \
-                values to search or directly use. If only a single value for \
-                each hyperparameter is provided then only cross-validation \
-                will be performed and no hyperparameter search will be \
-                performed. Defaults to None.
-            n_splits: The number of folds to generate in the outer loop \
-                of a nested cross-validation. Defaults to \
-                    :const:`shapfire.shapfire.DEFAULT_SPLITS`.
-            n_repeats: The number of new folds that should be generated \
-                in the outer loop of a nested cross-validation. Defaults to \
-                    :const:`shapfire.shapfire.DEFAULT_REPEATS`.
-            random_seed: The random seed to use for reproducibility purposes. \
-                Defaults to :const:`shapfire.utils.DEFAULT_RANDOM_SEED`.
-
-        Attributes:
-            history: A class attribute and pandas dataframe that contains the
-                performance score (and possibly other data) associated with each
-                test fold in a repeated corss-validation.
-        """
-        # Class vars corresponding to input args
-        self.estimator_class = estimator_class
-        self.scoring = scoring
-        self.estimator_params = estimator_params
-        self.n_splits = n_splits
-        self.n_repeats = n_repeats
-        self.feature_names = feature_names
-        self.random_seed = random_seed
-
-        # Check that the given input is valid
-        self._check_vars()
-
-        # Set random seed for reproducibility purposes
-        numpy.random.seed(self.random_seed)
-
-        # Public accessible vars associated with the most important features
-        # These vars wil eventually be set after a call to 'fit()'
-        self.history = pandas.DataFrame()
-
-    def fit(self, X: pandas.DataFrame, y: pandas.Series) -> "RefitHelper":
-        history: list[dict[str, typing.Any]] = []
-        repeat_number = 1
-
-        cv = get_kfold_cross_validator(
-            estimator_class=self.estimator_class,
-            n_repeats=self.n_repeats,
-            n_splits=self.n_splits,
-        )
-
-        for i, (train_ix, test_ix) in enumerate(cv.split(X=X, y=y)):
-            X_train, X_test = X.iloc[train_ix, :], X.iloc[test_ix, :]
-            y_train, y_test = y.values[train_ix], y.values[test_ix]
-
-            _X_train, _y_train = X_train[self.feature_names], y_train
-            estimator = self.estimator_class(
-                random_state=self.random_seed,
-                **self.estimator_params,
-            ).fit(
-                X=_X_train,
-                y=_y_train.ravel(),
-            )
-
-            score: typing.Union[None, dict[str, typing.Any]] = self._get_score(
-                estimator=estimator,
-                X_test=X_test[self.feature_names],
-                y_test=y_test,
-            )
-
-            if score is None:
-                raise NotImplementedError(
-                    f"The scorer '{self.scoring}' has not yet been "
-                    + "implemented for use with ShapFire."
-                )
-            dict_ = {
-                # 'score' a dictionary that contains data pertaining to
-                # the estimate of the performance on the outer loop CV test
-                # set using a certain scoring measure specified by
-                # 'self.scoring'.
-                "score": score,
-                "repeat_number": repeat_number,
-            }
-            history.append(dict_)
-            if ((i + 1) % self.n_splits) == 0:
-                repeat_number += 1
-
-        _history = pandas.DataFrame(data=history)
-        # If the current ShapFire object already has a 'self.history'
-        # defined then reset the dataframe so data does not accumulate
-        if self.history is not None:
-            self.history = pandas.DataFrame()
-        self.history = pandas.concat(
-            [
-                self.history.reset_index(drop=True),
-                _history.reset_index(drop=True),
-            ],
-            ignore_index=True,
-            join="outer",
-            axis=0,
-        )
-        return self
-
-    def _get_score(
-        self,
-        estimator: typing.Union[
-            lightgbm.LGBMClassifier,
-            lightgbm.LGBMRegressor,
-            sklearn.ensemble.RandomForestClassifier,
-            sklearn.ensemble.RandomForestRegressor,
-        ],
-        X_test: pandas.DataFrame,
-        y_test: pandas.Series,
-    ) -> typing.Union[None, dict[str, typing.Any]]:
-        """
-        Retrieve the performance score of an estimator on a given test set.
-
-        Args:
-            estimator: A LightGBM estimator from Microsoft's LightGBM \
-                gradient boosting decision tree framework. The estimator can \
-                either be a classifier or a regressor. The estimator is \
-                assumed to have been trained on a training dataset and \
-                should be evaluated on a test dataset.
-            X_test: A test dataset.
-            y_test: The samples associated with the target variable of the \
-                test dataset.
-
-        Raises:
-            ValueError: If the estimator can not be identified as being a \
-                classifier or regressor.
-
-        Returns:
-            Returns a dictionary with a performance score and possibly \
-            additional data pertaining to a certain type of performance score.
-        """
-        dict_ = {}
-        if is_classifier(self.estimator_class):
-            # Handle special scoring functions where additional data, beyond
-            # just a score, needs to be saved and passed on
-            if self.scoring == "roc_auc":
-                fpr, tpr, roc_auc = get_roc_auc_statistics(
-                    estimator=estimator,
-                    X_test=X_test,
-                    y_test=y_test,
-                )
-                dict_["fpr"] = fpr
-                dict_["tpr"] = tpr
-                dict_["roc_auc"] = roc_auc
-                return dict_
-            else:
-                raise ValueError("TODO: Not yet implemented!")
-        elif is_regressor(self.estimator_class):
-            raise ValueError("TODO: Not yet implemented!")
-        else:
-            raise ValueError(
-                "It could not be determined whether the given "
-                + f"'estimator': {estimator} is a classifier or a regressor."
-            )
-
-    def _check_vars(self):
-        _check_estimator_class(estimator_class=self.estimator_class)
-        _check_scoring_function(
-            estimator_class=self.estimator_class,
-            scoring=self.scoring,
-        )
-        _check_cv_params(n_splits=self.n_splits, n_repeats=self.n_repeats)

@@ -1,0 +1,52 @@
+{
+  "feature_names": [
+    "Maximal transversiel diameter (cm)",
+    "Pulse pressure (mmHg)",
+    "Body Surface Area calculated using the DuBois' formula",
+    "Maximal luminal area (cm2)",
+    "Statins",
+    "Distance between iliac bifurcatures (cm)",
+    "Distance between lowest renal artery to the aortic bifurcature (cm)",
+    "Platelet inhibitors",
+    "UniCa-score at max. size over 15mm",
+    "Right iliac artery maximal diameter (cm)",
+    "Anterior Wall thickness (mm)",
+    "Distance between right iliac bifurcature to the aortic bifurcature (cm)",
+    "Distance between the aortic bifurcature to os saccrum (cm)",
+    "Transvers outer-to-outer diameter of L3 (cm)",
+    "Smoking",
+    "Age",
+    "Distance between left iliac bifurcature to the aortic bifurcature (cm)",
+    "UniCa-score in thrombus",
+    "Suprarenal mural thrombe",
+    "Hypertension"
+  ],
+  "dtypes": {
+    "Maximal transversiel diameter (cm)": "float64",
+    "Pulse pressure (mmHg)": "float64",
+    "Body Surface Area calculated using the DuBois' formula": "float64",
+    "Maximal luminal area (cm2)": "float64",
+    "Statins": "category",
+    "Distance between iliac bifurcatures (cm)": "float64",
+    "Distance between lowest renal artery to the aortic bifurcature (cm)": "float64",
+    "Platelet inhibitors": "category",
+    "UniCa-score at max. size over 15mm": "float64",
+    "Right iliac artery maximal diameter (cm)": "float64",
+    "Anterior Wall thickness (mm)": "float64",
+    "Distance between right iliac bifurcature to the aortic bifurcature (cm)": "float64",
+    "Distance between the aortic bifurcature to os saccrum (cm)": "float64",
+    "Transvers outer-to-outer diameter of L3 (cm)": "float64",
+    "Smoking": "category",
+    "Age": "float64",
+    "Distance between left iliac bifurcature to the aortic bifurcature (cm)": "float64",
+    "UniCa-score in thrombus": "float64",
+    "Suprarenal mural thrombe": "category",
+    "Hypertension": "category"
+  },
+  "categorical_feature": [],
+  "missing_value_policy": "pass-through (NaN)",
+  "label_policy": {
+    "type": "threshold",
+    "threshold": 0.5
+  }
+}
