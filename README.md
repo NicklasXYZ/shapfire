@@ -20,11 +20,11 @@ First of all, clone the repository and enter into the root of the directory, the
 
 ### Create a virtual environment
 
-ShapFire requires Python 3.11:
+ShapFire has been tested with Python 3.11, so create a virtual environment using this version (e.g., using [conda](/docs/getting-started/miniconda/main#should-i-install-miniconda-or-anaconda-distribution)):
 
 ```bash
-python3.11 -m venv venv
-source venv/bin/activate
+conda create -n shapfire python=3.11;
+conda activate shapfire
 ```
 
 ### Install dependencies
