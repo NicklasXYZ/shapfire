@@ -16,6 +16,8 @@ This branch contains the version of ShapFire applied in the following paper:
 
 ## Setup 
 
+First of all, clone the repository and enter into the root of the directory, then proceed as follows.
+
 ### Create a virtual environment
 
 ShapFire requires Python 3.11:
@@ -42,7 +44,7 @@ jupyter notebook
 
 Once the notebook is open, then run all cells.
 
-## Applying Pre-trained models
+## Applying Pre-trained Models
 
 Three pre-trained models are available in the repository. Each includes model-specific data, metadata, and a schema for handling input/output:
 
